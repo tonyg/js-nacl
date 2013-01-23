@@ -49,8 +49,8 @@ function Target(length) {
     this.address = raw._malloc(length);
 }
 
-Target.prototype.extractBytes = function () {
-    var result = extractBytes(this.address, this.length);
+Target.prototype.extractBytes = function (offset) {
+    var result = extractBytes(this.address + (offset || 0), this.length - (offset || 0));
     raw._free(this.address);
     this.address = null;
     return result;
@@ -63,13 +63,58 @@ function free_all(addresses) {
 }
 
 //---------------------------------------------------------------------------
+// Random bytes
+
+var crypto = require("crypto");
+function random_bytes(count) {
+    return crypto.randomBytes(count);
+}
+
+//---------------------------------------------------------------------------
+// Boxing
+
+function crypto_box_keypair() {
+    var pk = new Target(raw._crypto_box_PUBLICKEYBYTES);
+    var sk = new Target(raw._crypto_box_SECRETKEYBYTES);
+    check("_crypto_box_keypair", raw._crypto_box_keypair(pk.address, sk.address));
+    return {boxPk: pk.extractBytes(), boxSk: sk.extractBytes()};
+}
+
+function crypto_box_random_nonce() {
+    return random_bytes(raw._crypto_box_NONCEBYTES);
+}
+
+function crypto_box(msg, nonce, pk, sk) {
+    var m = injectBytes(msg, raw._crypto_box_ZEROBYTES);
+    var na = check_injectBytes("crypto_box", "nonce", nonce, raw._crypto_box_NONCEBYTES);
+    var pka = check_injectBytes("crypto_box", "pk", pk, raw._crypto_box_PUBLICKEYBYTES);
+    var ska = check_injectBytes("crypto_box", "sk", sk, raw._crypto_box_SECRETKEYBYTES);
+    var c = new Target(msg.length + raw._crypto_box_ZEROBYTES);
+    check("_crypto_box", raw._crypto_box(c.address, m, c.length, 0, na, pka, ska));
+    free_all([na, pka, ska]);
+    return c.extractBytes(raw._crypto_box_BOXZEROBYTES);
+}
+
+function crypto_box_open(ciphertext, nonce, pk, sk) {
+    var c = injectBytes(ciphertext, raw._crypto_box_BOXZEROBYTES);
+    var na = check_injectBytes("crypto_box", "nonce", nonce, raw._crypto_box_NONCEBYTES);
+    var pka = check_injectBytes("crypto_box", "pk", pk, raw._crypto_box_PUBLICKEYBYTES);
+    var ska = check_injectBytes("crypto_box", "sk", sk, raw._crypto_box_SECRETKEYBYTES);
+    var m = new Target(ciphertext.length + raw._crypto_box_BOXZEROBYTES);
+    check("_crypto_box_open", raw._crypto_box_open(m.address, c, m.length, 0, na, pka, ska));
+    free_all([na, pka, ska]);
+    return m.extractBytes(raw._crypto_box_ZEROBYTES);
+}
+
+//---------------------------------------------------------------------------
+// Hashing
 
 function crypto_hash(bs) {
     var address = injectBytes(bs);
     var hash = new Target(raw._crypto_hash_BYTES);
     check("_crypto_hash", raw._crypto_hash(hash.address, address, bs.length, 0));
     raw._free(address);
-    return new Uint8Array(hash.extractBytes());
+    return hash.extractBytes();
 }
 
 function crypto_hash_string(s, encoding) {
@@ -77,11 +122,25 @@ function crypto_hash_string(s, encoding) {
 }
 
 //---------------------------------------------------------------------------
+// Symmetric-key encryption
+
+//---------------------------------------------------------------------------
+// One-time authentication
+
+//---------------------------------------------------------------------------
+// Authentication
+
+//---------------------------------------------------------------------------
+// Authenticated symmetric-key encryption
+
+//---------------------------------------------------------------------------
+// Signing
 
 function crypto_sign_keypair_from_seed(bs) {
     // Hash the bytes to get a secret key. This will be MODIFIED IN
     // PLACE by the call to crypto_sign_keypair_from_raw_sk below.
-    var ska = injectBytes(crypto_hash(bs).subarray(0, raw._crypto_sign_SECRETKEYBYTES));
+    var hash = new Uint8Array(crypto_hash(bs));
+    var ska = injectBytes(hash.subarray(0, raw._crypto_sign_SECRETKEYBYTES));
     var pk = new Target(raw._crypto_sign_PUBLICKEYBYTES);
     check("_crypto_sign_keypair_from_raw_sk",
 	  raw._crypto_sign_keypair_from_raw_sk(pk.address, ska));
@@ -92,31 +151,16 @@ function crypto_sign_keypair_from_seed(bs) {
 
 //---------------------------------------------------------------------------
 
-function crypto_box_keypair() {
-    var pk = new Target(raw._crypto_box_PUBLICKEYBYTES);
-    var sk = new Target(raw._crypto_box_SECRETKEYBYTES);
-    check("_crypto_box_keypair", raw._crypto_box_keypair(pk.address, sk.address));
-    return {boxPk: pk.extractBytes(), boxSk: sk.extractBytes()};
-}
-
-var crypto = require("crypto");
-function crypto_box_random_nonce() {
-    return crypto.randomBytes(raw._crypto_box_NONCEBYTES);
-}
-
-function crypto_box(msg, nonce, pk, sk) {
-    var m = injectBytes(msg, raw._crypto_box_ZEROBYTES);
-    var na = check_injectBytes("crypto_box", "nonce", nonce, raw._crypto_box_NONCEBYTES);
-    var pka = check_injectBytes("crypto_box", "pk", pk, raw._crypto_box_PUBLICKEYBYTES);
-    var ska = check_injectBytes("crypto_box", "sk", sk, raw._crypto_box_SECRETKEYBYTES);
-    var c = new Target(msg.length + raw._crypto_box_ZEROBYTES);
-    check("_crypto_box", raw._crypto_box(c.address, m, c.length, na, pka, ska));
-    free_all([na, pka, ska]);
-    return c.extractBytes();
-}
-
-//---------------------------------------------------------------------------
-
-console.log(new Buffer(crypto_hash_string("hello")).toString('hex'));
+console.log(crypto_hash_string("hello").toString('hex'));
 console.log(crypto_sign_keypair_from_seed(new Buffer("hello")));
+
+var k1 = crypto_box_keypair();
+var k2 = crypto_box_keypair();
+var n = crypto_box_random_nonce();
+console.log(n.toString('hex'));
+var c = crypto_box(new Buffer("hello world"), n, k2.boxPk, k1.boxSk);
+console.log(c.toString('hex'));
+var m = crypto_box_open(c, n, k1.boxPk, k2.boxSk);
+console.log(m.toString());
+
 // console.log(crypto_box_keypair());
