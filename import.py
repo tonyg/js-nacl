@@ -25,8 +25,15 @@ class JSApi:
         self.constants = {}
         self.aliases = {}
         self.version = open(join(NACL, "version"), "r").read().strip()
+        self._realfunctions = None
     def realfunctions(self):
-        return set((v for v in self.aliases.values() if v not in self.constants))
+        if self._realfunctions is None:
+            self._realfunctions = set((v for v in self.aliases.values() if v not in self.constants))
+            self._realfunctions.add("malloc")
+            self._realfunctions.add("free")
+            self._realfunctions.add("randombytes")
+            self._realfunctions.add("crypto_sign_keypair_from_raw_sk")
+        return self._realfunctions
 jsapi = JSApi()
 
 for op in lines("OPERATIONS"):
@@ -167,19 +174,12 @@ out.write("typedef unsigned int crypto_uint64;\n")
 out.write("#endif\n")
 out.close()
 
-os.mkdir(join(OUTPUT, "randombytes"))
-shutil.copy(join(NACL, "randombytes", "devurandom.c"),
-            join(OUTPUT, "randombytes", "devurandom.c"))
-
 # Emit the JS stuff from jsapi
 out = open(join(OUTPUT, "naclapi.js"), "w")
 for (k, v) in jsapi.constants.items():
-    out.write("%s = %d;\n" % (k, v))
+    out.write("Module['_%s'] = %d;\n" % (k, v))
 for (k, v) in jsapi.aliases.items():
-    if v in jsapi.realfunctions():
-        out.write("Module['%s'] = Module['%s'];\n" % (k, v))
-    else:
-        out.write("%s = %s;\n" % (k, v))
+    out.write("Module['_%s'] = Module['_%s'];\n" % (k, v))
 out.close()
 
 out = open(join(OUTPUT, "naclexports"), "w")

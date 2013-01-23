@@ -1,7 +1,5 @@
-Figure out how to run the jolly thing
-
-Figure out how to call, say, crypto_box
-
 Figure out what to do about randomness. This is a serious problem.
 SJCL? http://crypto.stanford.edu/sjcl/
 window.crypto.getRandomValues?
+
+Figure out what to do about the shift count overflow warnings.

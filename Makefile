@@ -1,4 +1,4 @@
-TARGET=nacl.js
+TARGET=nacl_raw.js
 NACLVERSION=20110221
 NACLUNPACKED=nacl-$(NACLVERSION)
 
@@ -11,7 +11,12 @@ $(TARGET): subnacl
 	$(PYTHON) $(EMCC) \
 		-s LINKABLE=1 \
 		-s EXPORTED_FUNCTIONS="$$(cat subnacl/naclexports.sh)" \
-		-O2 -o $@ $$(find subnacl -name '*.c') -I subnacl/include
+		--js-library nacl_randombytes_node.js \
+		--post-js subnacl/naclapi.js \
+		-O1 -o $@ \
+		-I subnacl/include \
+		keys.c \
+		$$(find subnacl -name '*.c')
 
 clean:
 	rm -f $(TARGET)
@@ -20,8 +25,6 @@ veryclean: clean
 	rm -rf subnacl
 	rm -rf $(NACLUNPACKED)
 
-subnacl: import.py $(NACLUNPACKED)
+subnacl: import.py
+	tar -jxvf $(NACLUNPACKED).tar.bz2
 	python import.py $(NACLUNPACKED)
-
-$(NACLUNPACKED): $(NACLUNPACKED).tar.bz2
-	tar -jxvf $<
