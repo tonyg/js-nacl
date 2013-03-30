@@ -129,6 +129,42 @@ var nacl = (function () {
 	return m.extractBytes(nacl_raw._crypto_box_ZEROBYTES);
     }
 
+    function crypto_box_precompute(pk, sk) {
+	var pka = check_injectBytes("crypto_box", "pk", pk, nacl_raw._crypto_box_PUBLICKEYBYTES);
+	var ska = check_injectBytes("crypto_box", "sk", sk, nacl_raw._crypto_box_SECRETKEYBYTES);
+	var k = new Target(nacl_raw._crypto_box_BEFORENMBYTES);
+	check("_crypto_box_beforenm",
+	      nacl_raw._crypto_box_beforenm(k.address, pka, ska));
+	free_all([pka, ska]);
+	return {boxK: k.extractBytes()};
+    }
+
+    function crypto_box_precomputed(msg, nonce, state) {
+	var m = injectBytes(msg, nacl_raw._crypto_box_ZEROBYTES);
+	var na = check_injectBytes("crypto_box_precomputed",
+				   "nonce", nonce, nacl_raw._crypto_box_NONCEBYTES);
+	var ka = check_injectBytes("crypto_box_precomputed",
+				   "boxK", state.boxK, nacl_raw._crypto_box_BEFORENMBYTES);
+	var c = new Target(msg.length + nacl_raw._crypto_box_ZEROBYTES);
+	check("_crypto_box_afternm",
+	      nacl_raw._crypto_box_afternm(c.address, m, c.length, 0, na, ka));
+	free_all([na, ka]);
+	return c.extractBytes(nacl_raw._crypto_box_BOXZEROBYTES);
+    }
+
+    function crypto_box_open_precomputed(ciphertext, nonce, state) {
+	var c = injectBytes(ciphertext, nacl_raw._crypto_box_BOXZEROBYTES);
+	var na = check_injectBytes("crypto_box_open_precomputed",
+				   "nonce", nonce, nacl_raw._crypto_box_NONCEBYTES);
+	var ka = check_injectBytes("crypto_box_open_precomputed",
+				   "boxK", state.boxK, nacl_raw._crypto_box_BEFORENMBYTES);
+	var m = new Target(ciphertext.length + nacl_raw._crypto_box_BOXZEROBYTES);
+	check("_crypto_box_open_afternm",
+	      nacl_raw._crypto_box_open_afternm(m.address, c, m.length, 0, na, ka));
+	free_all([na, ka]);
+	return m.extractBytes(nacl_raw._crypto_box_ZEROBYTES);
+    }
+
     //---------------------------------------------------------------------------
     // Hashing
 
@@ -196,6 +232,9 @@ var nacl = (function () {
     exports.crypto_box_random_nonce = crypto_box_random_nonce;
     exports.crypto_box = crypto_box;
     exports.crypto_box_open = crypto_box_open;
+    exports.crypto_box_precompute = crypto_box_precompute;
+    exports.crypto_box_precomputed = crypto_box_precomputed;
+    exports.crypto_box_open_precomputed = crypto_box_open_precomputed;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_string = crypto_hash_string;
