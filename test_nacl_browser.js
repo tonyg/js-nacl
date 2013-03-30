@@ -23,6 +23,10 @@ function do_tests() {
     output("PK: " + nacl.to_hex(kp.signPk));
     output("SK: " + nacl.to_hex(kp.signSk));
 
+    kp = nacl.crypto_box_keypair_from_seed(nacl.encode_utf8("hello"));
+    output("PK: " + nacl.to_hex(kp.boxPk));
+    output("SK: " + nacl.to_hex(kp.boxSk));
+
     var k1 = nacl.crypto_box_keypair();
     var k2 = nacl.crypto_box_keypair();
     var n = nacl.crypto_box_random_nonce();

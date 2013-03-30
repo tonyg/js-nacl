@@ -152,6 +152,9 @@ var nacl = (function () {
     //---------------------------------------------------------------------------
     // Signing
 
+    //---------------------------------------------------------------------------
+    // Keys
+
     function crypto_sign_keypair_from_seed(bs) {
 	// Hash the bytes to get a secret key. This will be MODIFIED IN
 	// PLACE by the call to crypto_sign_keypair_from_raw_sk below.
@@ -163,6 +166,17 @@ var nacl = (function () {
 	var sk = extractBytes(ska, nacl_raw._crypto_sign_SECRETKEYBYTES);
 	nacl_raw._free(ska);
 	return {signPk: pk.extractBytes(), signSk: sk};
+    }
+
+    function crypto_box_keypair_from_seed(bs) {
+	var hash = new Uint8Array(crypto_hash(bs));
+	var ska = injectBytes(hash.subarray(0, nacl_raw._crypto_box_SECRETKEYBYTES));
+	var pk = new Target(nacl_raw._crypto_box_PUBLICKEYBYTES);
+	check("_crypto_scalarmult_curve25519_base",
+	      nacl_raw._crypto_scalarmult_curve25519_base(pk.address, ska));
+	var sk = extractBytes(ska, nacl_raw._crypto_box_SECRETKEYBYTES);
+	nacl_raw._free(ska);
+	return {boxPk: pk.extractBytes(), boxSk: sk};
     }
 
     //---------------------------------------------------------------------------
@@ -180,6 +194,7 @@ var nacl = (function () {
     exports.crypto_hash_string = crypto_hash_string;
 
     exports.crypto_sign_keypair_from_seed = crypto_sign_keypair_from_seed;
+    exports.crypto_box_keypair_from_seed = crypto_box_keypair_from_seed;
 
     return exports;
 })();

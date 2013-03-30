@@ -33,6 +33,7 @@ class JSApi:
             self._realfunctions.add("free")
             self._realfunctions.add("randombytes")
             self._realfunctions.add("crypto_sign_keypair_from_raw_sk")
+            self._realfunctions.add("crypto_scalarmult_curve25519_base")
         return self._realfunctions
 jsapi = JSApi()
 

@@ -12,6 +12,10 @@ var kp = nacl.crypto_sign_keypair_from_seed(nacl.encode_utf8("hello"));
 console.log("PK: " + nacl.to_hex(kp.signPk));
 console.log("SK: " + nacl.to_hex(kp.signSk));
 
+kp = nacl.crypto_box_keypair_from_seed(nacl.encode_utf8("hello"));
+console.log("PK: " + nacl.to_hex(kp.boxPk));
+console.log("SK: " + nacl.to_hex(kp.boxSk));
+
 var k1 = nacl.crypto_box_keypair();
 var k2 = nacl.crypto_box_keypair();
 var n = nacl.crypto_box_random_nonce();
