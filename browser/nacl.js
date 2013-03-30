@@ -28,7 +28,7 @@ var nacl = (function () {
 	return decodeURIComponent(escape(encoded.join('')));
     }
 
-    function decode_hex(bs) {
+    function to_hex(bs) {
 	var encoded = [];
 	for (var i = 0; i < bs.length; i++) {
 	    encoded.push("0123456789abcdef"[(bs[i] >> 4) & 15]);
@@ -176,7 +176,7 @@ var nacl = (function () {
 
     exports.encode_utf8 = encode_utf8;
     exports.decode_utf8 = decode_utf8;
-    exports.decode_hex = decode_hex;
+    exports.to_hex = to_hex;
 
     exports.crypto_box_keypair = crypto_box_keypair;
     exports.crypto_box_random_nonce = crypto_box_random_nonce;
