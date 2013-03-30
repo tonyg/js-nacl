@@ -6,7 +6,7 @@ function main () {
     try {
 	do_tests();
     } catch (e) {
-	alert(JSON.stringify(e));
+	alert(e.message);
     }
 }
 
