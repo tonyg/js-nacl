@@ -8,8 +8,10 @@
 	    return bs;
 	};
     } else {
-	throw { name: "No cryptographic random number generator",
-		message: "Your browser does not support cryptographic random number generation." };
+	randomBytes = function (count) {
+	    throw { name: "No cryptographic random number generator",
+		    message: "Your browser does not support cryptographic random number generation." };
+	};
     }
 
     nacl_raw.RandomBytes.crypto = { "randomBytes": randomBytes };
