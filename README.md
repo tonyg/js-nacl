@@ -9,6 +9,18 @@ library](http://cr.yp.to/highspeed/coolnacl-20120725.pdf)" is an
 excellent summary of the motivation behind the NaCl API and library
 design.
 
+Using this library in the browser requires support for the newish
+`window.crypto.getRandomValues` API.
+
+## Building the library
+
+The git checkout includes a pre-compiled version of the library, so
+you won't need Emscripten unless you want to change something about
+the underlying NaCl library itself.
+
+Essentially, the source checkout contains everything you will need to
+use the library in both the browser and in node.js.
+
 ## Using the library
 
 In the browser, include the `browser/nacl.js` script:
