@@ -51,5 +51,17 @@ output("False: " + nacl.crypto_onetimeauth_verify(auth, nacl.encode_utf8("hellp"
 output("False: " + nacl.crypto_onetimeauth_verify(auth.subarray(1), nacl.encode_utf8("hello"), authkey));
 auth[0] = auth[0] + 1;
 output("False: " + nacl.crypto_onetimeauth_verify(auth, nacl.encode_utf8("hello"), authkey));
+output("");
+
+var authkey = nacl.crypto_hash(nacl.encode_utf8("hello")).subarray(0, nacl.crypto_auth_KEYBYTES);
+var auth = nacl.crypto_auth(nacl.encode_utf8("hello"), authkey);
+output("Auth key:      " + nacl.to_hex(authkey));
+output("Authenticator: " + nacl.to_hex(auth));
+output("True: " + nacl.crypto_auth_verify(auth, nacl.encode_utf8("hello"), authkey));
+output("False: " + nacl.crypto_auth_verify(auth, nacl.encode_utf8("hellp"), authkey));
+output("False: " + nacl.crypto_auth_verify(auth.subarray(1), nacl.encode_utf8("hello"), authkey));
+auth[0] = auth[0] + 1;
+output("False: " + nacl.crypto_auth_verify(auth, nacl.encode_utf8("hello"), authkey));
+output("");
 
 output("...done.");

@@ -238,6 +238,26 @@ var nacl = (function () {
     //---------------------------------------------------------------------------
     // Authentication
 
+    function crypto_auth(msg, key) {
+	var ka = check_injectBytes("crypto_auth", "key", key, nacl_raw._crypto_auth_KEYBYTES);
+	var ma = injectBytes(msg);
+	var authenticator = new Target(nacl_raw._crypto_auth_BYTES);
+	check("_crypto_auth", nacl_raw._crypto_auth(authenticator.address, ma, msg.length, 0, ka));
+	free_all([ka, ma]);
+	return authenticator.extractBytes();
+    }
+
+    function crypto_auth_verify(authenticator, msg, key) {
+	if (authenticator.length != nacl_raw._crypto_auth_BYTES) return false;
+	var ka = check_injectBytes("crypto_auth_verify",
+				   "key", key, nacl_raw._crypto_auth_KEYBYTES);
+	var ma = injectBytes(msg);
+	var aa = injectBytes(authenticator);
+	var result = nacl_raw._crypto_auth_verify(aa, ma, msg.length, 0, ka);
+	free_all([ka, ma, aa]);
+	return (result == 0);
+    }
+
     //---------------------------------------------------------------------------
     // Authenticated symmetric-key encryption
 
@@ -315,6 +335,9 @@ var nacl = (function () {
 
     exports.crypto_onetimeauth = crypto_onetimeauth;
     exports.crypto_onetimeauth_verify = crypto_onetimeauth_verify;
+
+    exports.crypto_auth = crypto_auth;
+    exports.crypto_auth_verify = crypto_auth_verify;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_string = crypto_hash_string;
