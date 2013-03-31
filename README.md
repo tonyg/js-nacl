@@ -241,6 +241,10 @@ If you see yourself wanting to use these, you will need to know why
 [scrypt](http://www.tarsnap.com/scrypt.html) are of crucial
 importance.
 
+You might like to explore the use of these functions in tandem with
+`scrypt.crypto_scrypt` from
+[js-scrypt](https://github.com/tonyg/js-scrypt).
+
 ### nacl.crypto\_sign\_keypair\_from\_seed(Uint8Array) → {"signPk": Uint8Array, "signSk": Uint8Array}
 
 Produces a *signing* keypair from its argument. A given binary input
