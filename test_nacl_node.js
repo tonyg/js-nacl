@@ -42,4 +42,14 @@ output("Ciphertext: " + nacl.to_hex(c));
 m = nacl.crypto_stream_xor(c, n, k);
 output("Plaintext: " + nacl.decode_utf8(m));
 
+var authkey = nacl.crypto_hash(nacl.encode_utf8("hello")).subarray(0, nacl.crypto_onetimeauth_KEYBYTES);
+var auth = nacl.crypto_onetimeauth(nacl.encode_utf8("hello"), authkey);
+output("Auth key:      " + nacl.to_hex(authkey));
+output("Authenticator: " + nacl.to_hex(auth));
+output("True: " + nacl.crypto_onetimeauth_verify(auth, nacl.encode_utf8("hello"), authkey));
+output("False: " + nacl.crypto_onetimeauth_verify(auth, nacl.encode_utf8("hellp"), authkey));
+output("False: " + nacl.crypto_onetimeauth_verify(auth.subarray(1), nacl.encode_utf8("hello"), authkey));
+auth[0] = auth[0] + 1;
+output("False: " + nacl.crypto_onetimeauth_verify(auth, nacl.encode_utf8("hello"), authkey));
+
 output("...done.");

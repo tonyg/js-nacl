@@ -207,6 +207,28 @@ var nacl = (function () {
     //---------------------------------------------------------------------------
     // One-time authentication
 
+    function crypto_onetimeauth(msg, key) {
+	var ka = check_injectBytes("crypto_onetimeauth",
+				   "key", key, nacl_raw._crypto_onetimeauth_KEYBYTES);
+	var ma = injectBytes(msg);
+	var authenticator = new Target(nacl_raw._crypto_onetimeauth_BYTES);
+	check("_crypto_onetimeauth",
+	      nacl_raw._crypto_onetimeauth(authenticator.address, ma, msg.length, 0, ka));
+	free_all([ka, ma]);
+	return authenticator.extractBytes();
+    }
+
+    function crypto_onetimeauth_verify(authenticator, msg, key) {
+	if (authenticator.length != nacl_raw._crypto_onetimeauth_BYTES) return false;
+	var ka = check_injectBytes("crypto_onetimeauth_verify",
+				   "key", key, nacl_raw._crypto_onetimeauth_KEYBYTES);
+	var ma = injectBytes(msg);
+	var aa = injectBytes(authenticator);
+	var result = nacl_raw._crypto_onetimeauth_verify(aa, ma, msg.length, 0, ka);
+	free_all([ka, ma, aa]);
+	return (result == 0);
+    }
+
     //---------------------------------------------------------------------------
     // Authentication
 
@@ -284,6 +306,9 @@ var nacl = (function () {
     exports.crypto_stream_random_nonce = crypto_stream_random_nonce;
     exports.crypto_stream = crypto_stream;
     exports.crypto_stream_xor = crypto_stream_xor;
+
+    exports.crypto_onetimeauth = crypto_onetimeauth;
+    exports.crypto_onetimeauth_verify = crypto_onetimeauth_verify;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_string = crypto_hash_string;
