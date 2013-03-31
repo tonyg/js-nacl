@@ -1,5 +1,3 @@
-    nacl_raw = Module;
-
     var randomBytes;
     if (window && window.crypto && window.crypto.getRandomValues) {
 	randomBytes = function (count) {
