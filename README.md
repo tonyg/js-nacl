@@ -1,4 +1,4 @@
-# js-nacl, Emscripten-compiled NaCl routines
+# js-nacl: Pure-Javascript Emscripten-compiled NaCl routines
 
 [Emscripten](https://github.com/kripken/emscripten)-compiled
 [NaCl](http://nacl.cr.yp.to/), a cryptographic library. Includes both
