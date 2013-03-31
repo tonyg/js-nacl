@@ -113,7 +113,7 @@ var nacl = (function () {
 	var ska = check_injectBytes("crypto_box", "sk", sk, nacl_raw._crypto_box_SECRETKEYBYTES);
 	var c = new Target(msg.length + nacl_raw._crypto_box_ZEROBYTES);
 	check("_crypto_box", nacl_raw._crypto_box(c.address, m, c.length, 0, na, pka, ska));
-	free_all([na, pka, ska]);
+	free_all([m, na, pka, ska]);
 	return c.extractBytes(nacl_raw._crypto_box_BOXZEROBYTES);
     }
 
@@ -124,7 +124,7 @@ var nacl = (function () {
 	var ska = check_injectBytes("crypto_box", "sk", sk, nacl_raw._crypto_box_SECRETKEYBYTES);
 	var m = new Target(ciphertext.length + nacl_raw._crypto_box_BOXZEROBYTES);
 	check("_crypto_box_open", nacl_raw._crypto_box_open(m.address, c, m.length, 0, na, pka, ska));
-	free_all([na, pka, ska]);
+	free_all([c, na, pka, ska]);
 	return m.extractBytes(nacl_raw._crypto_box_ZEROBYTES);
     }
 
@@ -147,7 +147,7 @@ var nacl = (function () {
 	var c = new Target(msg.length + nacl_raw._crypto_box_ZEROBYTES);
 	check("_crypto_box_afternm",
 	      nacl_raw._crypto_box_afternm(c.address, m, c.length, 0, na, ka));
-	free_all([na, ka]);
+	free_all([m, na, ka]);
 	return c.extractBytes(nacl_raw._crypto_box_BOXZEROBYTES);
     }
 
@@ -160,7 +160,7 @@ var nacl = (function () {
 	var m = new Target(ciphertext.length + nacl_raw._crypto_box_BOXZEROBYTES);
 	check("_crypto_box_open_afternm",
 	      nacl_raw._crypto_box_open_afternm(m.address, c, m.length, 0, na, ka));
-	free_all([na, ka]);
+	free_all([c, na, ka]);
 	return m.extractBytes(nacl_raw._crypto_box_ZEROBYTES);
     }
 
