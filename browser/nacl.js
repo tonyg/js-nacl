@@ -268,6 +268,35 @@ var nacl = (function () {
     //---------------------------------------------------------------------------
     // Authenticated symmetric-key encryption
 
+    function crypto_secretbox_random_nonce() {
+	return nacl_raw.RandomBytes.crypto.randomBytes(nacl_raw._crypto_secretbox_NONCEBYTES);
+    }
+
+    function crypto_secretbox(msg, nonce, key) {
+	var m = injectBytes(msg, nacl_raw._crypto_secretbox_ZEROBYTES);
+	var na = check_injectBytes("crypto_secretbox",
+				   "nonce", nonce, nacl_raw._crypto_secretbox_NONCEBYTES);
+	var ka = check_injectBytes("crypto_secretbox",
+				   "key", key, nacl_raw._crypto_secretbox_KEYBYTES);
+	var c = new Target(msg.length + nacl_raw._crypto_secretbox_ZEROBYTES);
+	check("_crypto_secretbox", nacl_raw._crypto_secretbox(c.address, m, c.length, 0, na, ka));
+	free_all([m, na, ka]);
+	return c.extractBytes(nacl_raw._crypto_secretbox_BOXZEROBYTES);
+    }
+
+    function crypto_secretbox_open(ciphertext, nonce, key) {
+	var c = injectBytes(ciphertext, nacl_raw._crypto_secretbox_BOXZEROBYTES);
+	var na = check_injectBytes("crypto_secretbox_open",
+				   "nonce", nonce, nacl_raw._crypto_secretbox_NONCEBYTES);
+	var ka = check_injectBytes("crypto_secretbox_open",
+				   "key", key, nacl_raw._crypto_secretbox_KEYBYTES);
+	var m = new Target(ciphertext.length + nacl_raw._crypto_secretbox_BOXZEROBYTES);
+	check("_crypto_secretbox_open",
+	      nacl_raw._crypto_secretbox_open(m.address, c, m.length, 0, na, ka));
+	free_all([c, na, ka]);
+	return m.extractBytes(nacl_raw._crypto_secretbox_ZEROBYTES);
+    }
+
     //---------------------------------------------------------------------------
     // Signing
 
@@ -345,6 +374,10 @@ var nacl = (function () {
 
     exports.crypto_auth = crypto_auth;
     exports.crypto_auth_verify = crypto_auth_verify;
+
+    exports.crypto_secretbox_random_nonce = crypto_secretbox_random_nonce;
+    exports.crypto_secretbox = crypto_secretbox;
+    exports.crypto_secretbox_open = crypto_secretbox_open;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_string = crypto_hash_string;

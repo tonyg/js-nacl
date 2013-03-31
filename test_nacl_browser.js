@@ -74,6 +74,15 @@ function do_tests() {
     output("False: " + nacl.crypto_auth_verify(auth, nacl.encode_utf8("hello"), authkey));
     output("");
 
+    n = nacl.crypto_secretbox_random_nonce();
+    var secretboxkey = nacl.crypto_hash(nacl.encode_utf8("hello")).subarray(0, nacl.crypto_secretbox_KEYBYTES);
+    output("Nonce: " + nacl.to_hex(n));
+    c = nacl.crypto_secretbox(nacl.encode_utf8("hello"), n, secretboxkey);
+    output("Ciphertext: " + nacl.to_hex(c));
+    m = nacl.crypto_secretbox_open(c, n, secretboxkey);
+    output("Plaintext: " + nacl.decode_utf8(m));
+    output("");
+
     output("...done.");
 }
 
