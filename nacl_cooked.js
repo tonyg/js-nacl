@@ -176,6 +176,34 @@ var nacl = (function () {
     //---------------------------------------------------------------------------
     // Symmetric-key encryption
 
+    function crypto_stream_random_nonce() {
+	return nacl_raw.RandomBytes.crypto.randomBytes(nacl_raw._crypto_stream_NONCEBYTES);
+    }
+
+    function crypto_stream(len, nonce, key) {
+	var na = check_injectBytes("crypto_stream",
+				   "nonce", nonce, nacl_raw._crypto_stream_NONCEBYTES);
+	var ka = check_injectBytes("crypto_stream",
+				   "key", key, nacl_raw._crypto_stream_KEYBYTES);
+	var out = new Target(len);
+	check("_crypto_stream", nacl_raw._crypto_stream(out.address, len, 0, na, ka));
+	free_all([na, ka]);
+	return out.extractBytes();
+    }
+
+    function crypto_stream_xor(msg, nonce, key) {
+	var na = check_injectBytes("crypto_stream_xor",
+				   "nonce", nonce, nacl_raw._crypto_stream_NONCEBYTES);
+	var ka = check_injectBytes("crypto_stream_xor",
+				   "key", key, nacl_raw._crypto_stream_KEYBYTES);
+	var ma = injectBytes(msg);
+	var out = new Target(msg.length);
+	check("_crypto_stream_xor",
+	      nacl_raw._crypto_stream_xor(out.address, ma, msg.length, 0, na, ka));
+	free_all([na, ka, ma]);
+	return out.extractBytes();
+    }
+
     //---------------------------------------------------------------------------
     // One-time authentication
 
@@ -252,6 +280,10 @@ var nacl = (function () {
     exports.crypto_box_precompute = crypto_box_precompute;
     exports.crypto_box_precomputed = crypto_box_precomputed;
     exports.crypto_box_open_precomputed = crypto_box_open_precomputed;
+
+    exports.crypto_stream_random_nonce = crypto_stream_random_nonce;
+    exports.crypto_stream = crypto_stream;
+    exports.crypto_stream_xor = crypto_stream_xor;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_string = crypto_hash_string;
