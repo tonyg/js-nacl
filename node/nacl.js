@@ -11,20 +11,29 @@ var nacl = (function () {
     // Horrifying UTF-8 and hex codecs
 
     function encode_utf8(s) {
-	var encoded = unescape(encodeURIComponent(s));
-	var result = new Uint8Array(encoded.length);
-	for (var i = 0; i < encoded.length; i++) {
-	    result[i] = encoded.charCodeAt(i);
+	return encode_latin1(unescape(encodeURIComponent(s)));
+    }
+
+    function encode_latin1(s) {
+	var result = new Uint8Array(s.length);
+	for (var i = 0; i < s.length; i++) {
+	    var c = s.charCodeAt(i);
+	    if ((c & 0xff) !== c) throw {message: "Cannot encode string in Latin1", str: s};
+	    result[i] = (c & 0xff);
 	}
 	return result;
     }
 
     function decode_utf8(bs) {
+	return decodeURIComponent(escape(decode_latin1(bs)));
+    }
+
+    function decode_latin1(bs) {
 	var encoded = [];
 	for (var i = 0; i < bs.length; i++) {
 	    encoded.push(String.fromCharCode(bs[i]));
 	}
-	return decodeURIComponent(escape(encoded.join('')));
+	return encoded.join('');
     }
 
     function to_hex(bs) {
@@ -352,7 +361,9 @@ var nacl = (function () {
     exports.crypto_stream_NONCEBYTES = nacl_raw._crypto_stream_NONCEBYTES;
 
     exports.encode_utf8 = encode_utf8;
+    exports.encode_latin1 = encode_latin1;
     exports.decode_utf8 = decode_utf8;
+    exports.decode_latin1 = decode_latin1;
     exports.to_hex = to_hex;
 
     exports.crypto_box_keypair = crypto_box_keypair;
