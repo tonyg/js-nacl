@@ -57,43 +57,43 @@ Follows the [NaCl crypto_box API](http://nacl.cr.yp.to/box.html).
 in the "Security model" section of [the
 documentation](http://nacl.cr.yp.to/box.html)!**
 
-### crypto\_box\_keypair() → {"boxPk": Uint8Array, "boxSk": Uint8Array}
+### nacl.crypto\_box\_keypair() → {"boxPk": Uint8Array, "boxSk": Uint8Array}
 
 Creates a fresh random keypair. `boxPk` is the public key and `boxSk`
 is the secret key.
 
-### crypto\_box\_random\_nonce() → Uint8Array
+### nacl.crypto\_box\_random\_nonce() → Uint8Array
 
 Returns a fresh randomly-chosen nonce suitable for use with
 `crypto_box`.
 
-### crypto\_box(Uint8Array msg, Uint8Array nonce, Uint8Array recipientPublicKey, Uint8Array senderSecretKey) → Uint8Array
+### nacl.crypto\_box(msgBin, nonceBin, recipientPublicKeyBin, senderSecretKeyBin) → Uint8Array
 
 Places `msg` in an authenticated, encrypted box that can only be
 verified and decrypted by the secret key corresponding to
 `recipientPublicKey`.
 
-### crypto\_box\_open(Uint8Array ciphertext, Uint8Array nonce, Uint8Array senderPublicKey, Uint8Array recipientSecretKey) → Uint8Array
+### nacl.crypto\_box\_open(ciphertextBin, nonceBin, senderPublicKeyBin, recipientSecretKeyBin) → Uint8Array
 
 Verifies and decrypts a box from `crypto_box`. Throws an exception if
 the verification fails or any of the inputs are invalid.
 
-### crypto\_box\_precompute(Uint8Array publicKey, Uint8Array secretKey) → {"boxK": Uint8Array}
+### nacl.crypto\_box\_precompute(publicKeyBin, secretKeyBin) → {"boxK": Uint8Array}
 
 Precomputes a shared secret between two parties. See the documentation
 for `crypto_box_beforenm` at the NaCl website.
 
-### crypto\_box\_precomputed(Uint8Array msg, Uint8Array nonce, {"boxK": Uint8Array}) → Uint8Array<br>crypto\_box\_open\_precomputed(Uint8Array ciphertext, Uint8Array nonce, {"boxK": Uint8Array}) → Uint8Array
+### nacl.crypto\_box\_precomputed(msgBin, nonceBin, {"boxK": Uint8Array}) → Uint8Array<br>nacl.crypto\_box\_open\_precomputed(ciphertextBin, nonceBin, {"boxK": Uint8Array}) → Uint8Array
 
 Precomputed-secret variants of `crypto_box` and `crypto_box_open`.
 
 ## Hashing: crypto_hash
 
-### crypto\_hash(Uint8Array) → Uint8Array
+### nacl.crypto\_hash(Uint8Array) → Uint8Array
 
 Computes the SHA-512 hash of its argument.
 
-### crypto\_hash\_string(String) → Uint8Array
+### nacl.crypto\_hash\_string(String) → Uint8Array
 
 Encodes its argument using `nacl.encode_utf8`, and then calls
 `crypto_hash`.
