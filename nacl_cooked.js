@@ -113,9 +113,12 @@ var nacl = (function () {
 
     function crypto_box_open(ciphertext, nonce, pk, sk) {
 	var c = injectBytes(ciphertext, nacl_raw._crypto_box_BOXZEROBYTES);
-	var na = check_injectBytes("crypto_box", "nonce", nonce, nacl_raw._crypto_box_NONCEBYTES);
-	var pka = check_injectBytes("crypto_box", "pk", pk, nacl_raw._crypto_box_PUBLICKEYBYTES);
-	var ska = check_injectBytes("crypto_box", "sk", sk, nacl_raw._crypto_box_SECRETKEYBYTES);
+	var na = check_injectBytes("crypto_box_open",
+				   "nonce", nonce, nacl_raw._crypto_box_NONCEBYTES);
+	var pka = check_injectBytes("crypto_box_open",
+				    "pk", pk, nacl_raw._crypto_box_PUBLICKEYBYTES);
+	var ska = check_injectBytes("crypto_box_open",
+				    "sk", sk, nacl_raw._crypto_box_SECRETKEYBYTES);
 	var m = new Target(ciphertext.length + nacl_raw._crypto_box_BOXZEROBYTES);
 	check("_crypto_box_open", nacl_raw._crypto_box_open(m.address, c, m.length, 0, na, pka, ska));
 	free_all([c, na, pka, ska]);
@@ -123,8 +126,10 @@ var nacl = (function () {
     }
 
     function crypto_box_precompute(pk, sk) {
-	var pka = check_injectBytes("crypto_box", "pk", pk, nacl_raw._crypto_box_PUBLICKEYBYTES);
-	var ska = check_injectBytes("crypto_box", "sk", sk, nacl_raw._crypto_box_SECRETKEYBYTES);
+	var pka = check_injectBytes("crypto_box_precompute",
+				    "pk", pk, nacl_raw._crypto_box_PUBLICKEYBYTES);
+	var ska = check_injectBytes("crypto_box_precompute",
+				    "sk", sk, nacl_raw._crypto_box_SECRETKEYBYTES);
 	var k = new Target(nacl_raw._crypto_box_BEFORENMBYTES);
 	check("_crypto_box_beforenm",
 	      nacl_raw._crypto_box_beforenm(k.address, pka, ska));
