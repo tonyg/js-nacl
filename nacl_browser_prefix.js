@@ -1,2 +1,3 @@
 var nacl = (function () {
-    var nacl_raw;
+    var Module = {};
+    var nacl_raw = Module;

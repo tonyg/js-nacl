@@ -217,6 +217,30 @@ var nacl = (function () {
 
     //---------------------------------------------------------------------------
 
+    exports.crypto_auth_BYTES = nacl_raw._crypto_auth_BYTES;
+    exports.crypto_auth_KEYBYTES = nacl_raw._crypto_auth_KEYBYTES;
+    exports.crypto_box_BEFORENMBYTES = nacl_raw._crypto_box_BEFORENMBYTES;
+    exports.crypto_box_BOXZEROBYTES = nacl_raw._crypto_box_BOXZEROBYTES;
+    exports.crypto_box_NONCEBYTES = nacl_raw._crypto_box_NONCEBYTES;
+    exports.crypto_box_PUBLICKEYBYTES = nacl_raw._crypto_box_PUBLICKEYBYTES;
+    exports.crypto_box_SECRETKEYBYTES = nacl_raw._crypto_box_SECRETKEYBYTES;
+    exports.crypto_box_ZEROBYTES = nacl_raw._crypto_box_ZEROBYTES;
+    exports.crypto_hash_BYTES = nacl_raw._crypto_hash_BYTES;
+    exports.crypto_hashblocks_BLOCKBYTES = nacl_raw._crypto_hashblocks_BLOCKBYTES;
+    exports.crypto_hashblocks_STATEBYTES = nacl_raw._crypto_hashblocks_STATEBYTES;
+    exports.crypto_onetimeauth_BYTES = nacl_raw._crypto_onetimeauth_BYTES;
+    exports.crypto_onetimeauth_KEYBYTES = nacl_raw._crypto_onetimeauth_KEYBYTES;
+    exports.crypto_secretbox_BOXZEROBYTES = nacl_raw._crypto_secretbox_BOXZEROBYTES;
+    exports.crypto_secretbox_KEYBYTES = nacl_raw._crypto_secretbox_KEYBYTES;
+    exports.crypto_secretbox_NONCEBYTES = nacl_raw._crypto_secretbox_NONCEBYTES;
+    exports.crypto_secretbox_ZEROBYTES = nacl_raw._crypto_secretbox_ZEROBYTES;
+    exports.crypto_sign_BYTES = nacl_raw._crypto_sign_BYTES;
+    exports.crypto_sign_PUBLICKEYBYTES = nacl_raw._crypto_sign_PUBLICKEYBYTES;
+    exports.crypto_sign_SECRETKEYBYTES = nacl_raw._crypto_sign_SECRETKEYBYTES;
+    exports.crypto_stream_BEFORENMBYTES = nacl_raw._crypto_stream_BEFORENMBYTES;
+    exports.crypto_stream_KEYBYTES = nacl_raw._crypto_stream_KEYBYTES;
+    exports.crypto_stream_NONCEBYTES = nacl_raw._crypto_stream_NONCEBYTES;
+
     exports.encode_utf8 = encode_utf8;
     exports.decode_utf8 = decode_utf8;
     exports.to_hex = to_hex;
