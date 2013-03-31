@@ -182,6 +182,34 @@ var nacl = (function () {
     //---------------------------------------------------------------------------
     // Symmetric-key encryption
 
+    function crypto_stream_random_nonce() {
+	return nacl_raw.RandomBytes.crypto.randomBytes(nacl_raw._crypto_stream_NONCEBYTES);
+    }
+
+    function crypto_stream(len, nonce, key) {
+	var na = check_injectBytes("crypto_stream",
+				   "nonce", nonce, nacl_raw._crypto_stream_NONCEBYTES);
+	var ka = check_injectBytes("crypto_stream",
+				   "key", key, nacl_raw._crypto_stream_KEYBYTES);
+	var out = new Target(len);
+	check("_crypto_stream", nacl_raw._crypto_stream(out.address, len, 0, na, ka));
+	free_all([na, ka]);
+	return out.extractBytes();
+    }
+
+    function crypto_stream_xor(msg, nonce, key) {
+	var na = check_injectBytes("crypto_stream_xor",
+				   "nonce", nonce, nacl_raw._crypto_stream_NONCEBYTES);
+	var ka = check_injectBytes("crypto_stream_xor",
+				   "key", key, nacl_raw._crypto_stream_KEYBYTES);
+	var ma = injectBytes(msg);
+	var out = new Target(msg.length);
+	check("_crypto_stream_xor",
+	      nacl_raw._crypto_stream_xor(out.address, ma, msg.length, 0, na, ka));
+	free_all([na, ka, ma]);
+	return out.extractBytes();
+    }
+
     //---------------------------------------------------------------------------
     // One-time authentication
 
@@ -223,6 +251,30 @@ var nacl = (function () {
 
     //---------------------------------------------------------------------------
 
+    exports.crypto_auth_BYTES = nacl_raw._crypto_auth_BYTES;
+    exports.crypto_auth_KEYBYTES = nacl_raw._crypto_auth_KEYBYTES;
+    exports.crypto_box_BEFORENMBYTES = nacl_raw._crypto_box_BEFORENMBYTES;
+    exports.crypto_box_BOXZEROBYTES = nacl_raw._crypto_box_BOXZEROBYTES;
+    exports.crypto_box_NONCEBYTES = nacl_raw._crypto_box_NONCEBYTES;
+    exports.crypto_box_PUBLICKEYBYTES = nacl_raw._crypto_box_PUBLICKEYBYTES;
+    exports.crypto_box_SECRETKEYBYTES = nacl_raw._crypto_box_SECRETKEYBYTES;
+    exports.crypto_box_ZEROBYTES = nacl_raw._crypto_box_ZEROBYTES;
+    exports.crypto_hash_BYTES = nacl_raw._crypto_hash_BYTES;
+    exports.crypto_hashblocks_BLOCKBYTES = nacl_raw._crypto_hashblocks_BLOCKBYTES;
+    exports.crypto_hashblocks_STATEBYTES = nacl_raw._crypto_hashblocks_STATEBYTES;
+    exports.crypto_onetimeauth_BYTES = nacl_raw._crypto_onetimeauth_BYTES;
+    exports.crypto_onetimeauth_KEYBYTES = nacl_raw._crypto_onetimeauth_KEYBYTES;
+    exports.crypto_secretbox_BOXZEROBYTES = nacl_raw._crypto_secretbox_BOXZEROBYTES;
+    exports.crypto_secretbox_KEYBYTES = nacl_raw._crypto_secretbox_KEYBYTES;
+    exports.crypto_secretbox_NONCEBYTES = nacl_raw._crypto_secretbox_NONCEBYTES;
+    exports.crypto_secretbox_ZEROBYTES = nacl_raw._crypto_secretbox_ZEROBYTES;
+    exports.crypto_sign_BYTES = nacl_raw._crypto_sign_BYTES;
+    exports.crypto_sign_PUBLICKEYBYTES = nacl_raw._crypto_sign_PUBLICKEYBYTES;
+    exports.crypto_sign_SECRETKEYBYTES = nacl_raw._crypto_sign_SECRETKEYBYTES;
+    exports.crypto_stream_BEFORENMBYTES = nacl_raw._crypto_stream_BEFORENMBYTES;
+    exports.crypto_stream_KEYBYTES = nacl_raw._crypto_stream_KEYBYTES;
+    exports.crypto_stream_NONCEBYTES = nacl_raw._crypto_stream_NONCEBYTES;
+
     exports.encode_utf8 = encode_utf8;
     exports.decode_utf8 = decode_utf8;
     exports.to_hex = to_hex;
@@ -234,6 +286,10 @@ var nacl = (function () {
     exports.crypto_box_precompute = crypto_box_precompute;
     exports.crypto_box_precomputed = crypto_box_precomputed;
     exports.crypto_box_open_precomputed = crypto_box_open_precomputed;
+
+    exports.crypto_stream_random_nonce = crypto_stream_random_nonce;
+    exports.crypto_stream = crypto_stream;
+    exports.crypto_stream_xor = crypto_stream_xor;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_string = crypto_hash_string;

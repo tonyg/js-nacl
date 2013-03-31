@@ -42,6 +42,15 @@ function do_tests() {
     output("Ciphertext: " + nacl.to_hex(c));
     m = nacl.crypto_box_open(c, n, kp.boxPk, kp.boxSk);
     output("Plaintext: " + nacl.decode_utf8(m));
+    output("");
+
+    n = new Uint8Array(nacl.crypto_stream_NONCEBYTES);
+    k = new Uint8Array(nacl.crypto_stream_KEYBYTES);
+    output("Stream: " + nacl.to_hex(nacl.crypto_stream(10, n, k)));
+    c = nacl.crypto_stream_xor(nacl.encode_utf8("hello"), n, k);
+    output("Ciphertext: " + nacl.to_hex(c));
+    m = nacl.crypto_stream_xor(c, n, k);
+    output("Plaintext: " + nacl.decode_utf8(m));
 
     output("...done.");
 }
