@@ -19,12 +19,7 @@ function do_tests() {
 
     output(nacl.to_hex(nacl.crypto_hash_string("hello")));
 
-    var kp = nacl.crypto_sign_keypair_from_seed(nacl.encode_utf8("hello"));
-    output("Signing PK: " + nacl.to_hex(kp.signPk));
-    output("Signing SK: " + nacl.to_hex(kp.signSk));
-    output("");
-
-    kp = nacl.crypto_box_keypair_from_seed(nacl.encode_utf8("hello"));
+    var kp = nacl.crypto_box_keypair_from_seed(nacl.encode_utf8("hello"));
     output("Box PK: " + nacl.to_hex(kp.boxPk));
     output("Box SK: " + nacl.to_hex(kp.boxSk));
     var selfShared = nacl.crypto_box_precompute(kp.boxPk, kp.boxSk);
@@ -81,6 +76,22 @@ function do_tests() {
     output("Ciphertext: " + nacl.to_hex(c));
     m = nacl.crypto_secretbox_open(c, n, secretboxkey);
     output("Plaintext: " + nacl.decode_utf8(m));
+    output("");
+
+    kp = nacl.crypto_sign_keypair_from_seed(nacl.encode_utf8("hello"));
+    output("Signing PK: " + nacl.to_hex(kp.signPk));
+    output("Signing SK: " + nacl.to_hex(kp.signSk));
+    c = nacl.crypto_sign(nacl.encode_utf8("message"), kp.signSk);
+    output("Signed  message: " + nacl.to_hex(c));
+    output("Signed  message: " + nacl.decode_latin1(c));
+    m = nacl.crypto_sign_open(c, kp.signPk);
+    output("Opened  message: " + nacl.decode_utf8(m));
+    c = nacl.decode_latin1(c);
+    c = c.substring(0, 35) + '!' + c.substring(36);
+    c = nacl.encode_latin1(c);
+    output("Corrupt message: " + nacl.decode_latin1(c));
+    m = nacl.crypto_sign_open(c, kp.signPk);
+    output("Detected corruption: " + (m === null));
     output("");
 
     output("...done.");

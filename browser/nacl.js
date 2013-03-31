@@ -309,6 +309,43 @@ var nacl = (function () {
     //---------------------------------------------------------------------------
     // Signing
 
+    function crypto_sign_keypair() {
+	var pk = new Target(nacl_raw._crypto_sign_PUBLICKEYBYTES);
+	var sk = new Target(nacl_raw._crypto_sign_SECRETKEYBYTES);
+	check("_crypto_sign_keypair", nacl_raw._crypto_sign_keypair(pk.address, sk.address));
+	return {signPk: pk.extractBytes(), signSk: sk.extractBytes()};
+    }
+
+    function crypto_sign(msg, sk) {
+	var ma = injectBytes(msg);
+	var ska = check_injectBytes("crypto_sign", "sk", sk, nacl_raw._crypto_sign_SECRETKEYBYTES);
+	var sm = new Target(msg.length + nacl_raw._crypto_sign_BYTES);
+	var smlen = new Target(8);
+	check("_crypto_sign",
+	      nacl_raw._crypto_sign(sm.address, smlen.address, ma, msg.length, 0, ska));
+	free_all([ma, ska]);
+	sm.length = nacl_raw.HEAPU32[smlen.address >> 2];
+	nacl_raw._free(smlen.address);
+	return sm.extractBytes();
+    }
+
+    function crypto_sign_open(sm, pk) {
+	var sma = injectBytes(sm);
+	var pka = check_injectBytes("crypto_sign_open",
+				    "pk", pk, nacl_raw._crypto_sign_PUBLICKEYBYTES);
+	var m = new Target(sm.length);
+	var mlen = new Target(8);
+	if (nacl_raw._crypto_sign_open(m.address, mlen.address, sma, sm.length, 0, pka) === 0) {
+	    free_all([sma, pka]);
+	    m.length = nacl_raw.HEAPU32[mlen.address >> 2];
+	    nacl_raw._free(mlen.address);
+	    return m.extractBytes();
+	} else {
+	    free_all([sma, pka, m.address, mlen.address]);
+	    return null;
+	}
+    }
+
     //---------------------------------------------------------------------------
     // Keys
 
@@ -389,6 +426,10 @@ var nacl = (function () {
     exports.crypto_secretbox_random_nonce = crypto_secretbox_random_nonce;
     exports.crypto_secretbox = crypto_secretbox;
     exports.crypto_secretbox_open = crypto_secretbox_open;
+
+    exports.crypto_sign_keypair = crypto_sign_keypair;
+    exports.crypto_sign = crypto_sign;
+    exports.crypto_sign_open = crypto_sign_open;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_string = crypto_hash_string;
