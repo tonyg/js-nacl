@@ -21,6 +21,10 @@ the underlying NaCl library itself.
 Essentially, the source checkout contains everything you will need to
 use the library in both the browser and in node.js.
 
+If you do find yourself wanting to build the library, see the
+instructions in
+[`BUILDING.md`](https://github.com/tonyg/js-nacl/blob/master/BUILDING.md).
+
 ## Using the library
 
 In the browser, include the `browser/nacl.js` script:
