@@ -11,6 +11,7 @@ $(NACLRAW): subnacl
 	$(PYTHON) $(EMCC) \
 		-s LINKABLE=1 \
 		-s EXPORTED_FUNCTIONS="$$(cat subnacl/naclexports.sh)" \
+		-s ALLOW_MEMORY_GROWTH=1 \
 		--js-library nacl_randombytes_node.js \
 		--post-js subnacl/naclapi.js \
 		-O1 --closure 1 -o $@ \
