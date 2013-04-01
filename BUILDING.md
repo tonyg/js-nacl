@@ -48,6 +48,9 @@ Within the `js-nacl` directory,
  - [`test_nacl_node.js`](test_nacl_node.js) is a simple example/test
    for running in node.js: `node test_nacl_node.js`.
 
+ - [`bm.html`](bm.html) and [`bm.js`](bm.js) are trivial speed
+   measurements for running in the browser.
+
 ## Method
 
 Follow the instructions from the [Emscripten
@@ -84,3 +87,11 @@ your `$PATH`.
 ## Serves four
 
 The build products will be in
+
+ - [`node_raw.js`](node_raw.js): output from Emscripten
+
+ - `browser/*`: Javascript for use in the browser
+
+ - `node/*`: Javascript for use in node.js
+
+ - `subnacl/*`: Unpacked `nacl` tarball, after processing by `import.py`
