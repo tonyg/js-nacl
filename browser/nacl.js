@@ -440,7 +440,12 @@ var nacl = (function () {
     return exports;
 })();
     var randomBytes;
-    if (window && window.crypto && window.crypto.getRandomValues) {
+    if (typeof module !== 'undefined' && module.exports) {
+	// add node.js implementations
+	var crypto = require('crypto');
+	randomBytes = crypto.randomBytes;
+    } else if (window && window.crypto && window.crypto.getRandomValues) {
+	// add in-browser implementation
 	randomBytes = function (count) {
 	    var bs = new Uint8Array(count);
 	    window.crypto.getRandomValues(bs);
@@ -458,3 +463,8 @@ var nacl = (function () {
     nacl.nacl_raw = nacl_raw;
     return nacl;
 })();
+
+// export common.js module to allow one js file for browser and node.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = nacl;
+}

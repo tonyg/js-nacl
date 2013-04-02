@@ -25,6 +25,8 @@ function do_tests() {
     var selfShared = nacl.crypto_box_precompute(kp.boxPk, kp.boxSk);
     output("Self-shared: " + nacl.to_hex(selfShared.boxK));
 
+    output("5 random bytes: " + nacl.to_hex(nacl.random_bytes(5)));
+
     var n = nacl.crypto_box_random_nonce();
     output("Nonce: " + nacl.to_hex(n));
 
