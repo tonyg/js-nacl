@@ -1,6 +1,6 @@
     var randomBytes;
     if (typeof module != 'undefined' && module.exports) {
-    	// add node.js implementations
+		// add node.js implementations
 		var crypto = require('crypto');
 		randomBytes = function(count) {
 			return crypto.randomBytes(count);
