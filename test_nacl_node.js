@@ -1,4 +1,4 @@
-var nacl = require("./node/nacl.js");
+var nacl = require("./browser/nacl.js");
 output = console.log;
 
 output("Starting...");
