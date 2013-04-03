@@ -46,8 +46,9 @@ Within the `js-nacl` directory,
    [`test_nacl.js`](test_nacl.js), which contains the actual test
    script.
 
- - [`bm.html`](bm.html) and [`bm.js`](bm.js) are trivial speed
-   measurements for running in the browser.
+ - [`benchmark.html`](benchmark.html) and
+   [`benchmark.js`](benchmark.js) are trivial speed measurements for
+   running in the browser.
 
 ## Method
 
