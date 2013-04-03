@@ -25,28 +25,26 @@ Within the `js-nacl` directory,
    for `nacl.crypto_sign_keypair_from_seed`.
 
  - [`nacl_cooked.js`](nacl_cooked.js) is the high-level Javascript
-   interface to the low-level code. It is common to both the node.js
-   and the in-browser variants of the finished build products.
+   interface to the low-level code.
 
- - [`nacl_browser_prefix.js`](nacl_browser_prefix.js) and
-   [`nacl_browser_suffix.js`](nacl_browser_suffix.js) are wrapped
+ - [`nacl_cooked_prefix.js`](nacl_cooked_prefix.js) and
+   [`nacl_cooked_suffix.js`](nacl_cooked_suffix.js) are wrapped
    around `nacl_cooked.js` and `nacl_raw.js` to create
-   `browser/nacl.js`.
+   `build/nacl.js`.
 
- - Similarly, [`nacl_node_prefix.js`](nacl_node_prefix.js) and
-   [`nacl_node_suffix.js`](nacl_node_suffix.js) are combined with
-   `nacl_cooked.js` to create `node/nacl.js`.
-
- - [`nacl_randombytes_node.js`](nacl_randombytes_node.js) is
+ - [`nacl_randombytes_emscripten.js`](nacl_randombytes_emscripten.js) is
    infrastructure for making the Emscripten-compiled library
    parameterized in its source of randomness.
 
- - [`test_nacl_browser.html`](test_nacl_browser.html) and
-   [`test_nacl_browser.js`](test_nacl_browser.js) are simple
-   examples/tests of the code for running in the browser.
+ - [`test_nacl_browser.html`](test_nacl_browser.html) is a simple
+   example/test of the code running in the browser.
 
  - [`test_nacl_node.js`](test_nacl_node.js) is a simple example/test
    for running in node.js: `node test_nacl_node.js`.
+
+ - Both of the previous two depend upon
+   [`test_nacl.js`](test_nacl.js), which contains the actual test
+   script.
 
  - [`bm.html`](bm.html) and [`bm.js`](bm.js) are trivial speed
    measurements for running in the browser.
@@ -84,14 +82,12 @@ set the `PYTHON` makefile variable; for example,
 Similarly, set `EMCC` to the path to your `emcc` binary if it's not on
 your `$PATH`.
 
-## Serves four
+## Serves three
 
 The build products will be in
 
  - [`node_raw.js`](node_raw.js): output from Emscripten
 
- - `browser/*`: Javascript for use in the browser
-
- - `node/*`: Javascript for use in node.js
+ - `build/*`: Javascript for use in the browser and in node.js
 
  - `subnacl/*`: Unpacked `nacl` tarball, after processing by `import.py`

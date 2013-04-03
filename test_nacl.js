@@ -1,16 +1,4 @@
-function output(x) {
-    document.getElementById("output").innerHTML += x + "\n";
-}
-
-function main () {
-    try {
-	do_tests();
-    } catch (e) {
-	alert(e.message);
-    }
-}
-
-function do_tests() {
+function do_tests(nacl, output) {
     output("Starting...");
 
     if ("c3a5c3a4c3b6" !== nacl.to_hex(nacl.encode_utf8("\xe5\xe4\xf6"))) {
@@ -99,4 +87,7 @@ function do_tests() {
     output("...done.");
 }
 
-window.onload = main;
+// export common.js module to allow one js file for browser and node.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports.do_tests = do_tests;
+}

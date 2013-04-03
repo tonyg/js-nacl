@@ -2,8 +2,19 @@
 <html>
   <head>
     <title>Testing nacl cryptography in the browser</title>
-    <script src="browser/nacl.js"></script>
-    <script src="test_nacl_browser.js"></script>
+    <script src="build/nacl.js"></script>
+    <script src="test_nacl.js"></script>
+    <script>
+    function main() {
+        try {
+            do_tests(nacl,
+                     function (x) { document.getElementById("output").innerHTML += x + "\n"; });
+        } catch (e) {
+            alert(e.message);
+        }
+    }
+    window.onload = main;
+    </script>
   </head>
   <body>
     <pre id="output"></pre>

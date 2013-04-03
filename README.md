@@ -23,19 +23,19 @@ use the library in both the browser and in node.js.
 
 If you do find yourself wanting to build the library, see the
 instructions in
-[`BUILDING.md`](https://github.com/tonyg/js-nacl/blob/master/BUILDING.md).
+[BUILDING.md](https://github.com/tonyg/js-nacl/blob/master/BUILDING.md).
 
 ## Using the library
 
-In the browser, include the `browser/nacl.js` script:
+In the browser, include the `build/nacl.js` script:
 
-    <script src="browser/nacl.js"></script>
+    <script src="build/nacl.js"></script>
     ...
     <script> alert(nacl.to_hex(nacl.random_bytes(16))); </script>
 
-In node.js, require the `node/nacl.js` module:
+In node.js, require the `build/nacl.js` module:
 
-    var nacl = require("./node/nacl.js");
+    var nacl = require("./build/nacl.js");
     ...
     console.log(nacl.to_hex(nacl.random_bytes(16)));
 

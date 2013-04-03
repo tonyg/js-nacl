@@ -5,14 +5,14 @@ NACLUNPACKED=nacl-$(NACLVERSION)
 PYTHON=python
 EMCC=`which emcc`
 
-all: node browser
+all: build
 
 $(NACLRAW): subnacl
 	$(PYTHON) $(EMCC) \
 		-s LINKABLE=1 \
 		-s EXPORTED_FUNCTIONS="$$(cat subnacl/naclexports.sh)" \
 		-s ALLOW_MEMORY_GROWTH=1 \
-		--js-library nacl_randombytes_node.js \
+		--js-library nacl_randombytes_emscripten.js \
 		--post-js subnacl/naclapi.js \
 		-O1 --closure 1 -o $@ \
 		-I subnacl/include \
@@ -21,16 +21,11 @@ $(NACLRAW): subnacl
 
 clean:
 	rm -f $(NACLRAW)
-	rm -rf node browser
+	rm -rf build
 
-node: $(NACLRAW) nacl_node_prefix.js nacl_cooked.js nacl_node_suffix.js
+build: $(NACLRAW) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
 	mkdir -p $@
-	cp $(NACLRAW) $@
-	cat nacl_node_prefix.js nacl_cooked.js nacl_node_suffix.js > $@/nacl.js
-
-browser: $(NACLRAW) nacl_browser_prefix.js nacl_cooked.js nacl_browser_suffix.js
-	mkdir -p $@
-	cat nacl_browser_prefix.js $(NACLRAW) nacl_cooked.js nacl_browser_suffix.js > $@/nacl.js
+	cat nacl_cooked_prefix.js $(NACLRAW) nacl_cooked.js nacl_cooked_suffix.js > $@/nacl.js
 
 veryclean: clean
 	rm -rf subnacl
