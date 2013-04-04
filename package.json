@@ -1,0 +1,13 @@
+{
+    "name": "js-nacl",
+    "version": "0.0.1",
+    "description": "Emscripten-compiled Javascript version of NaCl, the Networking and Cryptography library.",
+    "main": "build/nacl.js",
+    "author": "Tony Garnock-Jones",
+    "keywords": ["encryption", "high-level", "crypto", "networking", "nacl"],
+    "repository" : {
+        "type": "git",
+        "url": "https://github.com/tonyg/js-nacl.git"
+    },
+    "engines": { "node": "*" }
+}
