@@ -12,6 +12,13 @@ design.
 Using this library in the browser requires support for the newish
 `window.crypto.getRandomValues` API.
 
+## NPM Package
+
+This library is [registered on
+npmjs.org](https://npmjs.org/package/js-nacl). To install it:
+
+    npm install js-nacl
+
 ## Building the library
 
 The git checkout includes a pre-compiled version of the library, so
