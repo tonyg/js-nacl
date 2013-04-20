@@ -5,7 +5,7 @@ NACLUNPACKED=nacl-$(NACLVERSION)
 PYTHON=python
 EMCC=`which emcc`
 
-all: build
+all: lib
 
 $(NACLRAW): subnacl
 	$(PYTHON) $(EMCC) \
@@ -21,9 +21,9 @@ $(NACLRAW): subnacl
 
 clean:
 	rm -f $(NACLRAW)
-	rm -rf build
+	rm -rf lib
 
-build: $(NACLRAW) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
+lib: $(NACLRAW) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
 	mkdir -p $@
 	cat nacl_cooked_prefix.js $(NACLRAW) nacl_cooked.js nacl_cooked_suffix.js > $@/nacl.js
 

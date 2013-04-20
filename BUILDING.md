@@ -30,7 +30,7 @@ Within the `js-nacl` directory,
  - [`nacl_cooked_prefix.js`](nacl_cooked_prefix.js) and
    [`nacl_cooked_suffix.js`](nacl_cooked_suffix.js) are wrapped
    around `nacl_cooked.js` and `nacl_raw.js` to create
-   `build/nacl.js`.
+   `lib/nacl.js`.
 
  - [`nacl_randombytes_emscripten.js`](nacl_randombytes_emscripten.js) is
    infrastructure for making the Emscripten-compiled library
@@ -89,6 +89,6 @@ The build products will be in
 
  - [`node_raw.js`](node_raw.js): output from Emscripten
 
- - `build/*`: Javascript for use in the browser and in node.js
+ - `lib/*`: Javascript for use in the browser and in node.js
 
  - `subnacl/*`: Unpacked `nacl` tarball, after processing by `import.py`

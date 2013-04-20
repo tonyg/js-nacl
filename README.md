@@ -34,15 +34,21 @@ instructions in
 
 ## Using the library
 
-In the browser, include the `build/nacl.js` script:
+In the browser, include the `lib/nacl.js` script:
 
-    <script src="build/nacl.js"></script>
+    <script src="lib/nacl.js"></script>
     ...
     <script> alert(nacl.to_hex(nacl.random_bytes(16))); </script>
 
-In node.js, require the `build/nacl.js` module:
+In node.js, require the `lib/nacl.js` module:
 
-    var nacl = require("./build/nacl.js");
+    var nacl = require("./lib/nacl.js");
+    ...
+    console.log(nacl.to_hex(nacl.random_bytes(16)));
+
+Or if you have installed the library via `npm`,
+
+    var nacl = require("js-nacl");
     ...
     console.log(nacl.to_hex(nacl.random_bytes(16)));
 
