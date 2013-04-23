@@ -6,6 +6,7 @@ function do_tests(nacl, output) {
     }
 
     output(nacl.to_hex(nacl.crypto_hash_string("hello")));
+    output(nacl.to_hex(nacl.crypto_hash_sha256(nacl.encode_utf8("hello"))));
 
     var kp = nacl.crypto_box_keypair_from_seed(nacl.encode_utf8("hello"));
     output("Box PK: " + nacl.to_hex(kp.boxPk));

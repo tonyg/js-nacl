@@ -184,6 +184,15 @@ var nacl = (function () {
 	return hash.extractBytes();
     }
 
+    function crypto_hash_sha256(bs) {
+	var address = injectBytes(bs);
+	var hash = new Target(nacl_raw._crypto_hash_sha256_BYTES);
+	check("_crypto_hash_sha256",
+	      nacl_raw._crypto_hash_sha256(hash.address, address, bs.length, 0));
+	nacl_raw._free(address);
+	return hash.extractBytes();
+    }
+
     function crypto_hash_string(s) {
 	return crypto_hash(encode_utf8(s));
     }
@@ -377,6 +386,7 @@ var nacl = (function () {
     exports.crypto_box_SECRETKEYBYTES = nacl_raw._crypto_box_SECRETKEYBYTES;
     exports.crypto_box_ZEROBYTES = nacl_raw._crypto_box_ZEROBYTES;
     exports.crypto_hash_BYTES = nacl_raw._crypto_hash_BYTES;
+    exports.crypto_hash_sha256_BYTES = nacl_raw._crypto_hash_sha256_BYTES;
     exports.crypto_hashblocks_BLOCKBYTES = nacl_raw._crypto_hashblocks_BLOCKBYTES;
     exports.crypto_hashblocks_STATEBYTES = nacl_raw._crypto_hashblocks_STATEBYTES;
     exports.crypto_onetimeauth_BYTES = nacl_raw._crypto_onetimeauth_BYTES;
@@ -425,6 +435,7 @@ var nacl = (function () {
     exports.crypto_sign_open = crypto_sign_open;
 
     exports.crypto_hash = crypto_hash;
+    exports.crypto_hash_sha256 = crypto_hash_sha256;
     exports.crypto_hash_string = crypto_hash_string;
 
     exports.crypto_sign_keypair_from_seed = crypto_sign_keypair_from_seed;
