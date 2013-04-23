@@ -23,12 +23,16 @@ MACROS = lines("MACROS")
 class JSApi:
     def __init__(self):
         self.constants = {}
+        self.functions = set()
         self.aliases = {}
         self.version = open(join(NACL, "version"), "r").read().strip()
         self._realfunctions = None
     def realfunctions(self):
         if self._realfunctions is None:
-            self._realfunctions = set((v for v in self.aliases.values() if v not in self.constants))
+            self._realfunctions = set((f for f in self.functions
+                                       if not f in self.constants and
+                                       not f.endswith('_BEFORENMBYTES')))
+            # ^ The _BEFORENMBYTES thing seems like a bug; missing from api.h
             self._realfunctions.add("malloc")
             self._realfunctions.add("free")
             self._realfunctions.add("randombytes")
@@ -127,6 +131,11 @@ for op in lines("OPERATIONS"):
         out.write("\n")
         out.write("#endif\n")
         out.close()
+
+        # record exports even if this primitive is not selected
+        for m in op_macros:
+            m_prim = m.replace(op, "%s_%s" % (op,prim))
+            jsapi.functions.add(m_prim)
 
         # if this primitive is selected as a default, create a generic header
         # file for the operation
