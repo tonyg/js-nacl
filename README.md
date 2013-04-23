@@ -91,6 +91,9 @@ Follows the [NaCl crypto_hash API](http://nacl.cr.yp.to/hash.html).
 
 Computes the SHA-512 hash of its argument.
 
+While SHA-512 is recommended, the SHA-256 function is also available,
+as `nacl.crypto\_hash\_sha256`.
+
 ### nacl.crypto\_hash\_string(String) → Uint8Array
 
 Encodes its argument using `nacl.encode_utf8`, and then calls
