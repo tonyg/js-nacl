@@ -10,7 +10,7 @@ function main () {
     }
 }
 
-var TIMELIMIT = 1000;
+var TIMELIMIT = 500;
 
 function measure(desc, f) {
     var startTime = new Date().getTime();
@@ -34,6 +34,7 @@ function measure(desc, f) {
 function do_tests() {
     var hello = nacl.encode_utf8("hello");
     var kp = nacl.crypto_box_keypair_from_seed(hello);
+    var skp = nacl.crypto_sign_keypair_from_seed(hello);
     var selfShared = nacl.crypto_box_precompute(kp.boxPk, kp.boxSk);
     var n = nacl.crypto_box_random_nonce();
     var c = nacl.crypto_box_precomputed(hello, n, selfShared);
@@ -41,6 +42,8 @@ function do_tests() {
 
     var c2 = nacl.crypto_box(hello, n, kp.boxPk, kp.boxSk);
     var m2 = nacl.crypto_box_open(c2, n, kp.boxPk, kp.boxSk);
+
+    var signed = nacl.crypto_sign(m, skp.signSk);
 
     measure('nacl.crypto_hash_string("hello")',
 	    function () { return nacl.crypto_hash_string("hello") });
@@ -68,6 +71,12 @@ function do_tests() {
 
     measure('nacl.crypto_box_open(c2, n, kp.boxPk, kp.boxSk)',
 	    function () { return nacl.crypto_box_open(c2, n, kp.boxPk, kp.boxSk) });
+
+    measure('nacl.crypto_sign(m, skp.signSk)',
+	    function () { return nacl.crypto_sign(m, skp.signSk) });
+
+    measure('nacl.crypto_sign_open(signed, skp.signPk)',
+	    function () { return nacl.crypto_sign_open(signed, skp.signPk) });
 }
 
 window.onload = main;
