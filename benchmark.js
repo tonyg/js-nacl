@@ -1,12 +1,8 @@
-function output(x) {
-    document.getElementById("output").innerHTML += x + "\n";
-}
-
 function main () {
     try {
 	do_tests();
     } catch (e) {
-	alert(JSON.stringify(e));
+	output('EXCEPTION: ' + JSON.stringify(e));
     }
 }
 
@@ -79,4 +75,16 @@ function do_tests() {
 	    function () { return nacl.crypto_sign_open(signed, skp.signPk) });
 }
 
-window.onload = main;
+var output;
+if (typeof window !== 'undefined') {
+    output = function (x) {
+	document.getElementById("output").innerHTML += x + "\n";
+    };
+    window.onload = main;
+} else {
+    nacl = require("./lib/nacl.js");
+    output = function (x) {
+	console.log(x);
+    };
+    main();
+}
