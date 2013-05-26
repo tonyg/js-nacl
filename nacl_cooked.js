@@ -352,16 +352,14 @@ var nacl = (function () {
     // Keys
 
     function crypto_sign_keypair_from_seed(bs) {
-	// Hash the bytes to get a secret key. This will be MODIFIED IN
-	// PLACE by the call to crypto_sign_keypair_from_raw_sk below.
-	var hash = new Uint8Array(crypto_hash(bs));
-	var ska = injectBytes(hash.subarray(0, nacl_raw._crypto_sign_SECRETKEYBYTES));
+	var seeda = check_injectBytes("crypto_sign_keypair_from_seed",
+				      "seed", bs, nacl_raw._crypto_sign_SECRETKEYBYTES / 2);
 	var pk = new Target(nacl_raw._crypto_sign_PUBLICKEYBYTES);
+	var sk = new Target(nacl_raw._crypto_sign_SECRETKEYBYTES);
 	check("_crypto_sign_keypair_from_raw_sk",
-	      nacl_raw._crypto_sign_keypair_from_raw_sk(pk.address, ska));
-	var sk = extractBytes(ska, nacl_raw._crypto_sign_SECRETKEYBYTES);
-	nacl_raw._free(ska);
-	return {signPk: pk.extractBytes(), signSk: sk};
+	      nacl_raw._crypto_sign_keypair_from_raw_sk(pk.address, sk.address, seeda));
+	nacl_raw._free(seeda);
+	return {signPk: pk.extractBytes(), signSk: sk.extractBytes()};
     }
 
     function crypto_box_keypair_from_seed(bs) {

@@ -117,6 +117,7 @@ for op in lines("OPERATIONS"):
         out.write("#define %s_%s_H\n" % (op, prim))
         out.write("\n")
         for line in open(join(impldir, "api.h"), "r").readlines():
+            if not line.strip(): continue
             line = line.replace("CRYPTO_", "%s_%s_" % (op, prim))
             out.write(line)
             (constantname, constantstr) = line.replace("#define ", "").strip().split()
@@ -168,21 +169,16 @@ out.write("extern void randombytes(unsigned char *,unsigned long long);\n")
 out.write("#endif\n")
 out.close()
 
-out = open(join(INCLUDE, "crypto_uint32.h"), "w")
-out.write("#ifndef crypto_uint32_H\n")
-out.write("#define crypto_uint32_H\n")
-out.write("#include <stdint.h>\n")
-out.write("typedef uint32_t crypto_uint32;\n")
-out.write("#endif\n")
-out.close()
-
-out = open(join(INCLUDE, "crypto_uint64.h"), "w")
-out.write("#ifndef crypto_uint64_H\n")
-out.write("#define crypto_uint64_H\n")
-out.write("#include <stdint.h>\n")
-out.write("typedef uint64_t crypto_uint64;\n")
-out.write("#endif\n")
-out.close()
+for intkind in ['uint', 'int']:
+    for intsize in ['32', '64']:
+        t = intkind + intsize
+        out = open(join(INCLUDE, "crypto_%s.h" % (t,)), "w")
+        out.write("#ifndef crypto_%s_H\n" % (t,))
+        out.write("#define crypto_%s_H\n" % (t,))
+        out.write("#include <stdint.h>\n")
+        out.write("typedef %s_t crypto_%s;\n" % (t, t))
+        out.write("#endif\n")
+        out.close()
 
 # Emit the JS stuff from jsapi
 out = open(join(OUTPUT, "naclapi.js"), "w")

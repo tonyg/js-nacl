@@ -69,7 +69,7 @@ function do_tests(nacl, output) {
     output("Plaintext: " + nacl.decode_utf8(m));
     output("");
 
-    kp = nacl.crypto_sign_keypair_from_seed(nacl.encode_utf8("hello"));
+    kp = nacl.crypto_sign_keypair_from_seed(nacl.crypto_hash_string("This is my passphrase").subarray(0, 32));
     output("Signing PK: " + nacl.to_hex(kp.signPk));
     output("Signing SK: " + nacl.to_hex(kp.signSk));
     c = nacl.crypto_sign(nacl.encode_utf8("message"), kp.signSk);
