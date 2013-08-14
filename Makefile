@@ -8,14 +8,14 @@ EMCC=`which emcc`
 ## Builds well with emscripten of August 8, 2013 or newer and Clang/LLVM 3.2.
 all: lib
 
+
 $(NACLRAW): subnacl
-	$(PYTHON) $(EMCC) \
+	EMCC_DEBUG=2 $(PYTHON) $(EMCC) \
 		-s LINKABLE=1 \
 		-s EXPORTED_FUNCTIONS="$$(cat subnacl/naclexports.sh)" \
-		-s TOTAL_MEMORY=33554432 \
 		--js-library nacl_randombytes_emscripten.js \
 		--post-js subnacl/naclapi.js \
-		-O1 --closure 1 -o $@ \
+		-O2 --closure 1 -o $@ \
 		-I subnacl/include \
 		keys.c \
 		$$(find subnacl -name '*.c')

@@ -28,3 +28,14 @@ int crypto_sign_keypair_from_raw_sk(unsigned char *pk,
   }
   return 0;
 }
+
+/*
+ * This little subroutine is needed to let emscripten know that it
+ * should link in dlmalloc() rather than using the stub, leaky,
+ * allocate-only, free-is-a-no-op malloc implementation it has as a
+ * placeholder.
+ */
+#include <malloc.h>
+void *nacl_emscripten_dummy_force_malloc_inclusion(void) {
+  return malloc(10);
+}
