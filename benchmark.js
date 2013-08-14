@@ -1,29 +1,57 @@
 function main () {
+    if (typeof window !== 'undefined') {
+	var browser =
+	    navigator.userAgent.match(/Firefox\/[^ ]+/) ||
+	    navigator.userAgent.match(/Chrome\/[^ ]+/) ||
+	    navigator.userAgent.match(/Safari\/[^ ]+/) ||
+	    ["unknown/0.0"]; // perhaps it's IE. meh
+	output(browser[0]);
+    } else {
+	output("node/" + process.version);
+    }
+
+    output("Test,Iterations per second,Seconds per iteration");
+
     try {
-	do_tests();
+    	do_tests();
     } catch (e) {
-	output('EXCEPTION: ' + JSON.stringify(e));
+    	output('EXCEPTION: ' + JSON.stringify(e));
     }
 }
 
-var TIMELIMIT = 500;
+var TIMELIMIT = 1000;
 
 function measure(desc, f) {
-    var startTime = new Date().getTime();
-    var stopTime;
-    var delta;
-    var i = 0;
-    var result;
-    while (1) {
-	result = f();
-	i++;
-	stopTime = new Date().getTime();
-	delta = stopTime - startTime;
-	if (delta > TIMELIMIT) break;
+    try {
+	var iterations;
+	var iter_per_sec;
+	var best_iter_per_sec = 0;
+	var startTime;
+	var stopTime;
+	var delta;
+	var i;
+	var result;
+
+	for (iterations = 0; iterations < 3; iterations++) {
+	    startTime = new Date().getTime();
+	    i = 0;
+	    while (1) {
+		result = f();
+		i++;
+		stopTime = new Date().getTime();
+		delta = stopTime - startTime;
+		if (delta > TIMELIMIT) break;
+	    }
+	    iter_per_sec = i / (delta / 1000);
+	    if (iter_per_sec > best_iter_per_sec) best_iter_per_sec = iter_per_sec;
+	}
+
+	var sec_per_iter = 1.0 / best_iter_per_sec;
+	output([JSON.stringify(desc), best_iter_per_sec, sec_per_iter].join(','));
+    } catch (e) {
+	result = null;
+	output([JSON.stringify(desc), "FAILED", "FAILED", JSON.stringify(e)].join(','));
     }
-    var iter_per_sec = i / (delta / 1000);
-    var sec_per_iter = (delta / 1000) / i;
-    output(desc + ", " + iter_per_sec + " Hz, " + sec_per_iter + " seconds per iteration");
     return result;
 }
 
@@ -41,38 +69,50 @@ function do_tests() {
 
     var signed = nacl.crypto_sign(m, skp.signSk);
 
-    measure('nacl.crypto_hash_string("hello")',
-	    function () { return nacl.crypto_hash_string("hello") });
+    var tests = [
+	['nacl.crypto_hash_string("hello")',
+	 function () { return nacl.crypto_hash_string("hello") }],
 
-    measure('nacl.crypto_hash(hello)',
-	    function () { return nacl.crypto_hash(hello) });
+	['nacl.crypto_hash(hello)',
+	 function () { return nacl.crypto_hash(hello) }],
 
-    measure('nacl.crypto_box_keypair_from_seed(hello)',
-	    function () { return nacl.crypto_box_keypair_from_seed(hello) });
+	['nacl.crypto_box_keypair_from_seed(hello)',
+	 function () { return nacl.crypto_box_keypair_from_seed(hello) }],
 
-    measure('nacl.crypto_box_precompute(kp.boxPk, kp.boxSk)',
-	    function () { return nacl.crypto_box_precompute(kp.boxPk, kp.boxSk) });
+	['nacl.crypto_box_precompute(kp.boxPk, kp.boxSk)',
+	 function () { return nacl.crypto_box_precompute(kp.boxPk, kp.boxSk) }],
 
-    measure('nacl.crypto_box_random_nonce()',
-	    function () { return nacl.crypto_box_random_nonce() });
+	['nacl.crypto_box_random_nonce()',
+	 function () { return nacl.crypto_box_random_nonce() }],
 
-    measure('nacl.crypto_box_precomputed(hello, n, selfShared)',
-	    function () { return nacl.crypto_box_precomputed(hello, n, selfShared) });
+	['nacl.crypto_box_precomputed(hello, n, selfShared)',
+	 function () { return nacl.crypto_box_precomputed(hello, n, selfShared) }],
 
-    measure('nacl.crypto_box_open_precomputed(c, n, selfShared)',
-	    function () { return nacl.crypto_box_open_precomputed(c, n, selfShared) });
+	['nacl.crypto_box_open_precomputed(c, n, selfShared)',
+	 function () { return nacl.crypto_box_open_precomputed(c, n, selfShared) }],
 
-    measure('nacl.crypto_box(hello, n, kp.boxPk, kp.boxSk)',
-	    function () { return nacl.crypto_box(hello, n, kp.boxPk, kp.boxSk) });
+	['nacl.crypto_box(hello, n, kp.boxPk, kp.boxSk)',
+	 function () { return nacl.crypto_box(hello, n, kp.boxPk, kp.boxSk) }],
 
-    measure('nacl.crypto_box_open(c2, n, kp.boxPk, kp.boxSk)',
-	    function () { return nacl.crypto_box_open(c2, n, kp.boxPk, kp.boxSk) });
+	['nacl.crypto_box_open(c2, n, kp.boxPk, kp.boxSk)',
+	 function () { return nacl.crypto_box_open(c2, n, kp.boxPk, kp.boxSk) }],
 
-    measure('nacl.crypto_sign(m, skp.signSk)',
-	    function () { return nacl.crypto_sign(m, skp.signSk) });
+	['nacl.crypto_sign(m, skp.signSk)',
+	 function () { return nacl.crypto_sign(m, skp.signSk) }],
 
-    measure('nacl.crypto_sign_open(signed, skp.signPk)',
-	    function () { return nacl.crypto_sign_open(signed, skp.signPk) });
+	['nacl.crypto_sign_open(signed, skp.signPk)',
+	 function () { return nacl.crypto_sign_open(signed, skp.signPk) }]
+    ];
+
+    var testNum = 0;
+    function runNextTest() {
+	if (testNum < tests.length) {
+	    measure(tests[testNum][0], tests[testNum][1]);
+	    testNum++;
+	    setTimeout(runNextTest, 0);
+	}
+    }
+    runNextTest();
 }
 
 var output;
