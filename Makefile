@@ -5,13 +5,14 @@ NACLUNPACKED=nacl-$(NACLVERSION)
 PYTHON=python
 EMCC=`which emcc`
 
+## Builds well with emscripten of August 8, 2013 or newer and Clang/LLVM 3.2.
 all: lib
 
 $(NACLRAW): subnacl
 	$(PYTHON) $(EMCC) \
 		-s LINKABLE=1 \
 		-s EXPORTED_FUNCTIONS="$$(cat subnacl/naclexports.sh)" \
-		-s ALLOW_MEMORY_GROWTH=1 \
+		-s TOTAL_MEMORY=33554432 \
 		--js-library nacl_randombytes_emscripten.js \
 		--post-js subnacl/naclapi.js \
 		-O1 --closure 1 -o $@ \
