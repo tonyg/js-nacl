@@ -2,12 +2,12 @@
 <html>
   <head>
     <title>Testing nacl cryptography in the browser</title>
-    <script src="lib/nacl.js"></script>
+    <script src="lib/nacl_factory.js"></script>
     <script src="test_nacl.js"></script>
     <script>
     function main() {
         try {
-            do_tests(nacl,
+            do_tests(nacl_factory.instantiate(),
                      function (x) { document.getElementById("output").innerHTML += x + "\n"; });
         } catch (e) {
             alert(e.message);

@@ -12,6 +12,13 @@ design.
 Using this library in the browser requires support for the newish
 `window.crypto.getRandomValues` API.
 
+## Changes
+
+Version 0.5.0: **API change.** Instead of being provided with a module
+`nacl`, with API functions available directly, library importers are
+given `nacl_factory` with a single function `instantiate`, which
+returns a `nacl` instance containing the API functions.
+
 ## NPM Package
 
 This library is [registered on
@@ -34,23 +41,48 @@ instructions in
 
 ## Using the library
 
-In the browser, include the `lib/nacl.js` script:
+In the browser, include the `lib/nacl_factory.js` script:
 
-    <script src="lib/nacl.js"></script>
+    <script src="lib/nacl_factory.js"></script>
     ...
-    <script> alert(nacl.to_hex(nacl.random_bytes(16))); </script>
+    <script>
+      var nacl = nacl_factory.instantiate();
+      alert(nacl.to_hex(nacl.random_bytes(16)));
+    </script>
 
-In node.js, require the `lib/nacl.js` module:
+In node.js, require the `lib/nacl_factory.js` module:
 
-    var nacl = require("./lib/nacl.js");
+    var nacl_factory = require("./lib/nacl_factory.js");
+    var nacl = nacl_factory.instantiate();
     ...
     console.log(nacl.to_hex(nacl.random_bytes(16)));
 
 Or if you have installed the library via `npm`,
 
-    var nacl = require("js-nacl");
+    var nacl_factory = require("js-nacl");
+    var nacl = nacl_factory.instantiate();
     ...
     console.log(nacl.to_hex(nacl.random_bytes(16)));
+
+## Instantiating the NaCl module
+
+Calling `nacl_factory.instantiate()` creates an entirely fresh module
+instance, complete with its own private heap area. By default, this
+heap is 32 megabytes in size, 33,554,432 bytes. The size of the module
+instance's private heap can be altered by supplying an argument to
+`instantiate`, e.g.:
+
+    var nacl = nacl_factory.instantiate(16777216);
+
+The argument must be a power of two, if supplied.
+
+It's fine to instantiate the module more than once in a single
+program, though do note the large amount of memory taken up by each
+instance. The memory assigned to each module instance will not be
+released until the instance is garbage collected.
+
+If you notice memory leaks across multiple uses of a *single* module
+instance, please report them, with a test case if at all possible.
 
 ## Strings vs. Binary Data
 

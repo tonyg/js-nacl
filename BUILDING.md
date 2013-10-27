@@ -30,7 +30,7 @@ Within the `js-nacl` directory,
  - [`nacl_cooked_prefix.js`](nacl_cooked_prefix.js) and
    [`nacl_cooked_suffix.js`](nacl_cooked_suffix.js) are wrapped
    around `nacl_cooked.js` and `nacl_raw.js` to create
-   `lib/nacl.js`.
+   `lib/nacl_factory.js`.
 
  - [`nacl_randombytes_emscripten.js`](nacl_randombytes_emscripten.js) is
    infrastructure for making the Emscripten-compiled library

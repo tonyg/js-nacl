@@ -13,7 +13,7 @@ function main () {
     output("Test,Iterations per second,Seconds per iteration");
 
     try {
-    	do_tests();
+	do_tests(nacl_factory.instantiate());
     } catch (e) {
     	output('EXCEPTION: ' + JSON.stringify(e));
     }
@@ -55,7 +55,7 @@ function measure(desc, f) {
     return result;
 }
 
-function do_tests() {
+function do_tests(nacl) {
     var hello = nacl.encode_utf8("hello");
     var kp = nacl.crypto_box_keypair_from_seed(hello);
     var skp = nacl.crypto_sign_keypair_from_seed(nacl.crypto_hash_string("This is my passphrase").subarray(0, 32));
@@ -122,7 +122,7 @@ if (typeof window !== 'undefined') {
     };
     window.onload = main;
 } else {
-    nacl = require("./lib/nacl.js");
+    nacl_factory = require("./lib/nacl_factory.js");
     output = function (x) {
 	console.log(x);
     };

@@ -21,9 +21,11 @@
     nacl.random_bytes = randomBytes;
     nacl.nacl_raw = nacl_raw;
     return nacl;
-})((typeof window !== 'undefined') ? window : null, (typeof document !== 'undefined') ? document : null);
+   })((typeof window !== 'undefined') ? window : null, (typeof document !== 'undefined') ? document : null);
+  }
+};
 
 // export common.js module to allow one js file for browser and node.js
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = nacl;
+    module.exports = nacl_factory;
 }

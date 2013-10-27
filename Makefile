@@ -26,7 +26,8 @@ clean:
 
 lib: $(NACLRAW) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
 	mkdir -p $@
-	cat nacl_cooked_prefix.js $(NACLRAW) nacl_cooked.js nacl_cooked_suffix.js > $@/nacl.js
+	cat nacl_cooked_prefix.js $(NACLRAW) nacl_cooked.js nacl_cooked_suffix.js \
+		> $@/nacl_factory.js
 
 veryclean: clean
 	rm -rf subnacl
