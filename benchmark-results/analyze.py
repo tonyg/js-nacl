@@ -1,5 +1,7 @@
+# coding=utf-8
 import csv
 import sys
+import math
 
 class dialect(csv.excel):
     lineterminator = '\n'
@@ -124,6 +126,7 @@ def speedups():
             writer.writerow(['Engine'] + fns)
             for e in engine_names:
                 writer.writerow([e] + [by_engine[e][f] for f in fns])
+    return by_engine
 
 def absolutes():
     by_engine = {}
@@ -147,5 +150,35 @@ def absolutes():
             for e in engine_names:
                 writer.writerow([e] + [by_engine[e][f] for f in fns])
 
-speedups()
+def snippets(speedups_table):
+    with open('snippets.md', 'w') as outfile:
+        for (cat, label, tests) in testmap:
+            ratios = []
+            for e in engine_names:
+                prod = 1.0
+                count = 1
+                for (f, u) in tests:
+                    if speedups_table[e][f]:
+                        prod = prod * speedups_table[e][f]
+                        count = count + 1
+                geomean = math.pow(prod, 1.0 / count)
+                ratios.append(e + ' = ' + ('%.2g' % geomean) + '×')
+            ratios = '; '.join(ratios)
+            outfile.write('''
+<img src="<?config.image_url?>/tech/benchmarking-nacl-and-scrypt-in-the-browser-201308/hz-%(cat)s-640.png" alt="%(label)s">
+
+(Approximate speedups since January: %(ratios)s. [Chart](<?config.image_url?>/tech/benchmarking-nacl-and-scrypt-in-the-browser-201308/speedups-%(cat)s-640.png).)
+''' % {"cat": cat, "label": label, "ratios": ratios})
+
+#             f.write('''
+# <table>
+# <tr>
+# <td><a href="<?config.image_url?>/tech/benchmarking-nacl-and-scrypt-in-the-browser-201308/hz-%(cat)s-640.png"><img src="<?config.image_url?>/tech/benchmarking-nacl-and-scrypt-in-the-browser-201308/hz-%(cat)s-319.png" alt="%(label)s"></a></td>
+# <td><a href="<?config.image_url?>/tech/benchmarking-nacl-and-scrypt-in-the-browser-201308/speedups-%(cat)s-640.png"><img src="<?config.image_url?>/tech/benchmarking-nacl-and-scrypt-in-the-browser-201308/speedups-%(cat)s-319.png" alt="Speedup, as ratio since January"></a></td>
+# </tr>
+# </table>
+# ''' % {"cat": cat, "label": label})
+
+speedups_table = speedups()
 absolutes()
+snippets(speedups_table)
