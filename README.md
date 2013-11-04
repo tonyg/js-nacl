@@ -255,13 +255,12 @@ Follows the [NaCl crypto_auth API](http://nacl.cr.yp.to/auth.html).
 
 Follows the [NaCl crypto_sign API](http://nacl.cr.yp.to/sign.html).
 
-Note the warning in the NaCl API documentation:
+Note that this uses the version of [Ed25519](http://ed25519.cr.yp.to/)
+from [SUPERCOP](http://bench.cr.yp.to/supercop.html), and *not* the
+old prototype implementation from the nacl 20110221 release.
 
-> WARNING: This signature software (both at the C level and at the C++
-> level) is a prototype. It will be replaced by the final system
-> [Ed25519](http://ed25519.cr.yp.to/) in future NaCl releases. A
-> NaCl-compatible Ed25519 implementation is already available as part
-> of [SUPERCOP](http://bench.cr.yp.to/supercop.html).
+The SUPERCOP Ed25519 signature scheme used is compatible with
+libsodium and most other bindings and wrappers of libsodium and nacl.
 
 ### nacl.crypto\_sign\_keypair() → {"signPk": Uint8Array, "signSk": Uint8Array}
 
