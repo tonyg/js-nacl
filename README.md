@@ -297,10 +297,23 @@ You might like to explore the use of these functions in tandem with
 `scrypt.crypto_scrypt` from
 [js-scrypt](https://github.com/tonyg/js-scrypt).
 
+It is not generally safe to supply (for example) a user's passphrase
+directly to these procedures without using PBKDF2, scrypt or something
+similar beforehand.
+
 ### nacl.crypto\_sign\_keypair\_from\_seed(Uint8Array) → {"signPk": Uint8Array, "signSk": Uint8Array}
 
 Produces a *signing* keypair from its argument. A given binary input
 will always produce the same keypair as output.
+
+The input must be 32 bytes long. As
+[Brian Warner puts it](https://blog.mozilla.org/warner/2011/11/29/ed25519-keys/),
+"Ed25519 keys start life as a 32-byte (256-bit) uniformly random
+binary seed" such as might be produced by sha256, or better yet,
+PBKDF2 or scrypt.
+
+Make sure to read and understand the warnings relating to passpharses,
+PBKDF2 and scrypt at the beginning of this section.
 
 Compatible with [PyNaCl](https://github.com/warner/pynacl)'s
 `crypto_sign_keypair_fromseed` and
@@ -311,8 +324,30 @@ Compatible with [PyNaCl](https://github.com/warner/pynacl)'s
 Produces an *encrypted authenticated box* keypair from its argument. A
 given binary input will always produce the same keypair as output.
 
+The input may be of any length. The input is hashed once with sha512,
+and the first 32 bytes of the result are taken as the 32-byte secret
+key, which is then passed to `nacl.crypto_box_keypair_from_raw_sk`.
+
+Make sure to read and understand the warnings relating to passpharses,
+PBKDF2 and scrypt at the beginning of this section.
+
 Compatible with [racl](https://github.com/tonyg/racl)'s
 `bytes->crypto-box-keypair`.
+
+### nacl.crypto\_box\_keypair\_from\_raw\_sk(Uint8Array) → {"boxPk": Uint8Array, "boxSk": Uint8Array}
+
+Produces an *encrypted authenticated box* keypair from its argument. A
+given binary input will always produce the same keypair as output.
+
+The input must be 32 bytes long, and could be a random 32-byte value,
+or the output of sha256, or better yet, the output of PBKDF2 or
+scrypt.
+
+Make sure to read and understand the warnings relating to passpharses,
+PBKDF2 and scrypt at the beginning of this section.
+
+Compatible with [racl](https://github.com/tonyg/racl)'s
+`crypto-box-sk->pk`.
 
 ## License
 

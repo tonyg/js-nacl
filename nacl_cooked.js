@@ -379,11 +379,16 @@ var nacl = (function () {
 
     function crypto_box_keypair_from_seed(bs) {
 	var hash = new Uint8Array(crypto_hash(bs));
-	var ska = injectBytes(hash.subarray(0, nacl_raw._crypto_box_SECRETKEYBYTES));
+	return crypto_box_keypair_from_raw_sk(hash.subarray(0,
+							    nacl_raw._crypto_box_SECRETKEYBYTES));
+    }
+
+    function crypto_box_keypair_from_raw_sk(sk) {
+	var ska = check_injectBytes("crypto_box_keypair_from_raw_sk", "sk", sk,
+				    nacl_raw._crypto_box_SECRETKEYBYTES);
 	var pk = new Target(nacl_raw._crypto_box_PUBLICKEYBYTES);
 	check("_crypto_scalarmult_curve25519_base",
 	      nacl_raw._crypto_scalarmult_curve25519_base(pk.address, ska));
-	var sk = extractBytes(ska, nacl_raw._crypto_box_SECRETKEYBYTES);
 	FREE(ska);
 	return {boxPk: pk.extractBytes(), boxSk: sk};
     }
