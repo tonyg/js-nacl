@@ -43,7 +43,7 @@ var nacl = (function () {
     function from_hex(s) {
         var result = new Uint8Array(s.length / 2);
         for (var i = 0; i < s.length / 2; i++) {
-            result[i] = parseInt(str.substr(2*i,2),16);
+            result[i] = parseInt(s.substr(2*i,2),16);
         }
         return result;
     }
