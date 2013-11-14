@@ -95,6 +95,11 @@ data. Binary data is represented using instances of
 Returns a lower-case hexadecimal representation of the given binary
 data.
 
+### nacl.from_hex(String) → Uint8Array
+
+Converts a lower- or upper-case hexadecimal representation of binary
+data into the equivalent Uint8Array.
+
 ### nacl.encode_utf8(String) → Uint8Array
 
 Returns the binary equivalent of the argument, encoded using UTF-8.
