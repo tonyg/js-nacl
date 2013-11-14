@@ -392,41 +392,33 @@ var nacl = (function () {
     }
 
     function crypto_box_keypair_from_raw_sk(sk) {
-	var ska = check_injectBytes("crypto_box_keypair_from_raw_sk", "sk", sk,
-				    nacl_raw._crypto_box_SECRETKEYBYTES);
-	var pk = new Target(nacl_raw._crypto_box_PUBLICKEYBYTES);
-	check("_crypto_scalarmult_curve25519_base",
-	      nacl_raw._crypto_scalarmult_curve25519_base(pk.address, ska));
-	FREE(ska);
-	return {boxPk: pk.extractBytes(), boxSk: sk};
+	return {boxPk: crypto_scalarmult_base(sk), boxSk: sk};
     }
 
     //---------------------------------------------------------------------------
     // Scalarmult
 
     function crypto_scalarmult(n,p) {
-        n = new Uint8Array(n);
-        p = new Uint8Array(p);
-        var na = injectBytes(n.subarray(0, nacl_raw._crypto_scalarmult_curve25519_SCALARBYTES));
-        var pa = injectBytes(p.subarray(0, nacl_raw._crypto_scalarmult_curve25519_BYTES));
+	var na = check_injectBytes("crypto_scalarmult", "n", n,
+				   nacl_raw._crypto_scalarmult_curve25519_SCALARBYTES);
+	var pa = check_injectBytes("crypto_scalarmult", "p", p,
+				   nacl_raw._crypto_scalarmult_curve25519_BYTES);
         var q = new Target(nacl_raw._crypto_scalarmult_curve25519_BYTES);
         check("_crypto_scalarmult_curve25519",
               nacl_raw._crypto_scalarmult_curve25519(q.address, na, pa));
-        q = q.extractBytes();
         FREE(na);
         FREE(pa);
-        return q;
+        return q.extractBytes();
     }
 
     function crypto_scalarmult_base(n) {
-        n = new Uint8Array(n);
-        var na = injectBytes(n.subarray(0, nacl_raw._crypto_scalarmult_curve25519_SCALARBYTES));
+	var na = check_injectBytes("crypto_scalarmult_base", "n", n,
+				   nacl_raw._crypto_scalarmult_curve25519_SCALARBYTES);
         var q = new Target(nacl_raw._crypto_scalarmult_curve25519_BYTES);
         check("_crypto_scalarmult_curve25519_base",
               nacl_raw._crypto_scalarmult_curve25519_base(q.address, na));
-        q = q.extractBytes();
         FREE(na);
-        return q;
+        return q.extractBytes();
     }
 
     //---------------------------------------------------------------------------
