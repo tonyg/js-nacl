@@ -40,6 +40,14 @@ var nacl = (function () {
 	return encoded.join('');
     }
 
+    function from_hex(s) {
+        var result = new Uint8Array(s.length / 2);
+        for (var i = 0; i < s.length / 2; i++) {
+            result[i] = parseInt(str.substr(2*i,2),16);
+        }
+        return result;
+    }
+
     //---------------------------------------------------------------------------
     // Allocation
 
@@ -425,6 +433,7 @@ var nacl = (function () {
     exports.decode_utf8 = decode_utf8;
     exports.decode_latin1 = decode_latin1;
     exports.to_hex = to_hex;
+    exports.from_hex = from_hex;
 
     exports.crypto_box_keypair = crypto_box_keypair;
     exports.crypto_box_random_nonce = crypto_box_random_nonce;
