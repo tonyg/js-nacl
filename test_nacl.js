@@ -5,6 +5,10 @@ function do_tests(nacl, output) {
 	alert("UTF-8 encoding isn't working properly");
     }
 
+    output(nacl.to_hex(nacl.encode_utf8("hello")));
+    output(nacl.decode_utf8(nacl.from_hex("68656c6c6f")));
+    output(nacl.decode_utf8(nacl.from_hex("68656C6C6F")));
+
     output(nacl.to_hex(nacl.crypto_hash_string("hello")));
     output(nacl.to_hex(nacl.crypto_hash_sha256(nacl.encode_utf8("hello"))));
 
