@@ -353,6 +353,24 @@ PBKDF2 and scrypt at the beginning of this section.
 Compatible with [racl](https://github.com/tonyg/racl)'s
 `crypto-box-sk->pk`.
 
+## Low-level tools
+
+### nacl.crypto\_scalarmult(Uint8Array, Uint8Array) → Uint8Array
+
+Expects two binaries, the first of length
+`nacl.crypto_scalarmult_SCALARBYTES` (representing an integer), and
+the second of length `nacl.crypto_scalarmult_BYTES` (representing a
+group element). The two are multiplied using the underlying NaCl
+`crypto_scalarmult` primitive, and the resulting
+`nacl.crypto_scalarmult_BYTES`-length group element binary is
+returned.
+
+### nacl.crypto\_scalarmult\_base(Uint8Array) → Uint8Array
+
+As `nacl.crypto_scalarmult`, but multiplies the
+`nacl.crypto_scalarmult_SCALARBYTES`-length argument by a standard
+group element, returning the result.
+
 ## License
 
 js-nacl is written by Tony Garnock-Jones <tonygarnockjones@gmail.com>
