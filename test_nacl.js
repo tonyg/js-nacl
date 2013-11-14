@@ -85,6 +85,14 @@ function do_tests(nacl, output) {
     output("Detected corruption: " + (m === null));
     output("");
 
+    // Check correctness of curve25519 via NaCl test vector
+    var alice_private = nacl.from_hex("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a");
+    var bob_public = nacl.from_hex("de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f");
+    if (nacl.to_hex(nacl.crypto_scalarmult(alice_private,bob_public)) !=
+        "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742") {
+        throw {message: "curve25519 failed"};
+    }
+
     output("...done.");
 }
 

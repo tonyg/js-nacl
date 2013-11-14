@@ -40,6 +40,14 @@ var nacl = (function () {
 	return encoded.join('');
     }
 
+    function from_hex(s) {
+        var result = new Uint8Array(s.length / 2);
+        for (var i = 0; i < s.length / 2; i++) {
+            result[i] = parseInt(str.substr(2*i,2),16);
+        }
+        return result;
+    }
+
     //---------------------------------------------------------------------------
     // Allocation
 
@@ -394,6 +402,34 @@ var nacl = (function () {
     }
 
     //---------------------------------------------------------------------------
+    // Scalarmult
+
+    function crypto_scalarmult(n,p) {
+        n = new Uint8Array(n);
+        p = new Uint8Array(p);
+        var na = injectBytes(n.subarray(0, nacl_raw._crypto_scalarmult_curve25519_SCALARBYTES));
+        var pa = injectBytes(p.subarray(0, nacl_raw._crypto_scalarmult_curve25519_BYTES));
+        var q = new Target(nacl_raw._crypto_scalarmult_curve25519_BYTES);
+        check("_crypto_scalarmult_curve25519",
+              nacl_raw._crypto_scalarmult_curve25519(q.address, na, pa));
+        q = q.extractBytes();
+        FREE(na);
+        FREE(pa);
+        return q;
+    }
+
+    function crypto_scalarmult_base(n) {
+        n = new Uint8Array(n);
+        var na = injectBytes(n.subarray(0, nacl_raw._crypto_scalarmult_curve25519_SCALARBYTES));
+        var q = new Target(nacl_raw._crypto_scalarmult_curve25519_BYTES);
+        check("_crypto_scalarmult_curve25519_base",
+              nacl_raw._crypto_scalarmult_curve25519_base(q.address, na));
+        q = q.extractBytes();
+        FREE(na);
+        return q;
+    }
+
+    //---------------------------------------------------------------------------
 
     exports.crypto_auth_BYTES = nacl_raw._crypto_auth_BYTES;
     exports.crypto_auth_KEYBYTES = nacl_raw._crypto_auth_KEYBYTES;
@@ -419,12 +455,15 @@ var nacl = (function () {
     exports.crypto_stream_BEFORENMBYTES = nacl_raw._crypto_stream_BEFORENMBYTES;
     exports.crypto_stream_KEYBYTES = nacl_raw._crypto_stream_KEYBYTES;
     exports.crypto_stream_NONCEBYTES = nacl_raw._crypto_stream_NONCEBYTES;
+    exports.crypto_scalarmult_SCALARBYTES = nacl_raw._crypto_scalarmult_curve25519_SCALARBYTES;
+    exports.crypto_scalarmult_BYTES = nacl_raw._crypto_scalarmult_curve25519_BYTES;
 
     exports.encode_utf8 = encode_utf8;
     exports.encode_latin1 = encode_latin1;
     exports.decode_utf8 = decode_utf8;
     exports.decode_latin1 = decode_latin1;
     exports.to_hex = to_hex;
+    exports.from_hex = from_hex;
 
     exports.crypto_box_keypair = crypto_box_keypair;
     exports.crypto_box_random_nonce = crypto_box_random_nonce;
@@ -458,6 +497,9 @@ var nacl = (function () {
 
     exports.crypto_sign_keypair_from_seed = crypto_sign_keypair_from_seed;
     exports.crypto_box_keypair_from_seed = crypto_box_keypair_from_seed;
+
+    exports.crypto_scalarmult = crypto_scalarmult;
+    exports.crypto_scalarmult_base = crypto_scalarmult_base;
 
     return exports;
 })();
