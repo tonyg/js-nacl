@@ -489,6 +489,7 @@ var nacl = (function () {
 
     exports.crypto_sign_keypair_from_seed = crypto_sign_keypair_from_seed;
     exports.crypto_box_keypair_from_seed = crypto_box_keypair_from_seed;
+    exports.crypto_box_keypair_from_raw_sk = crypto_box_keypair_from_raw_sk;
 
     exports.crypto_scalarmult = crypto_scalarmult;
     exports.crypto_scalarmult_base = crypto_scalarmult_base;

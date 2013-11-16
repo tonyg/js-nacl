@@ -89,6 +89,15 @@ function do_tests(nacl, output) {
     output("Detected corruption: " + (m === null));
     output("");
 
+    kp = nacl.crypto_box_keypair_from_raw_sk(nacl.random_bytes(nacl.crypto_box_SECRETKEYBYTES));
+    n = nacl.crypto_box_random_nonce();
+    if (nacl.decode_utf8(nacl.crypto_box_open(nacl.crypto_box(nacl.encode_utf8("message"),
+							      n, kp.boxPk, kp.boxSk),
+					      n, kp.boxPk, kp.boxSk)) !== "message") {
+	throw {message: "Roundtrip with random box secret key failed"};
+    }
+    output("Random box secret key roundtrip success");
+
     // Check correctness of curve25519 via NaCl test vector
     var alice_private = nacl.from_hex("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a");
     var bob_public = nacl.from_hex("de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f");
