@@ -12,6 +12,15 @@ design.
 Using this library in the browser requires support for the newish
 `window.crypto.getRandomValues` API.
 
+**WARNING**: This code will not run in Safari version 5.1.x; or, at
+least, will not run when Safari's Javascript debug mode is *disabled*.
+Symptoms include corruption during hash calculation, failures when
+unboxing, and failures when producing and verifying signatures. Safari
+7.0 seems to be just fine, however. I don't know exactly at which
+version Safari started working: I don't have access to enough of a
+range of systems. The code has run fine on Chrome and Firefox across
+all the versions I've tried.
+
 ## Changes
 
 Version 0.5.0: **API change.** Instead of being provided with a module
