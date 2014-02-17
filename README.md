@@ -149,6 +149,10 @@ Encodes its argument using `nacl.encode_utf8`, and then calls
 
 Follows the [NaCl crypto_box API](http://nacl.cr.yp.to/box.html).
 
+You do not need to perform any padding of any arguments to these
+functions; the API given here is most similar to the "C++" API in the
+NaCl documentation.
+
 **Make sure to follow the instructions regarding nonce selection given
 in the "Security model" section of the NaCl API documentation!**
 
@@ -196,6 +200,10 @@ Precomputed-secret variants of `crypto_box` and `crypto_box_open`.
 ## Secret-key authenticated encryption: crypto_secretbox
 
 Follows the [NaCl crypto_secretbox API](http://nacl.cr.yp.to/secretbox.html).
+
+You do not need to perform any padding of any arguments to these
+functions; the API given here is most similar to the "C++" API in the
+NaCl documentation.
 
 **Make sure to follow the instructions regarding nonce selection given
 in the "Security model" section of the NaCl API documentation!**
