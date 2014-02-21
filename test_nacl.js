@@ -77,16 +77,29 @@ function do_tests(nacl, output) {
     output("Signing PK: " + nacl.to_hex(kp.signPk));
     output("Signing SK: " + nacl.to_hex(kp.signSk));
     c = nacl.crypto_sign(nacl.encode_utf8("message"), kp.signSk);
-    output("Signed  message: " + nacl.to_hex(c));
-    output("Signed  message: " + nacl.decode_latin1(c));
+    detached_sig = nacl.crypto_sign_detached(nacl.encode_utf8("message"), kp.signSk);
+    output("Detached signature:  " + nacl.to_hex(detached_sig));
+    output("Signed  message:     " + nacl.to_hex(c));
+    output("Signed  message:     " + nacl.decode_latin1(c));
     m = nacl.crypto_sign_open(c, kp.signPk);
-    output("Opened  message: " + nacl.decode_utf8(m));
+    output("Opened  message:     " + nacl.decode_utf8(m));
+    output("Verification of sig: " + nacl.crypto_sign_verify_detached(detached_sig,
+								      nacl.encode_utf8("message"),
+								      kp.signPk));
     c = nacl.decode_latin1(c);
     c = c.substring(0, 35) + '!' + c.substring(36);
     c = nacl.encode_latin1(c);
     output("Corrupt message: " + nacl.decode_latin1(c));
     m = nacl.crypto_sign_open(c, kp.signPk);
     output("Detected corruption: " + (m === null));
+
+    detached_sig = nacl.decode_latin1(detached_sig);
+    detached_sig = detached_sig.substring(0, 35) + '!' + detached_sig.substring(36);
+    detached_sig = nacl.encode_latin1(detached_sig);
+    output("Corrupt signature:   " + nacl.to_hex(detached_sig));
+    output("Corrupt verifies:    " + nacl.crypto_sign_verify_detached(detached_sig,
+								      nacl.encode_utf8("message"),
+								      kp.signPk));
     output("");
 
     kp = nacl.crypto_box_keypair_from_raw_sk(nacl.random_bytes(nacl.crypto_box_SECRETKEYBYTES));

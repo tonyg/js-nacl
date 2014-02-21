@@ -305,6 +305,22 @@ Verifies the signature on the given `packetBin`, and if it is valid,
 extracts the carried message and returns it. If the signature could
 not be verified, returns `null`.
 
+### nacl.crypto\_sign\_detached(msgBin, signerSecretKey) → Uint8Array
+
+**WARNING: Experimental.** Produces a "detached" signature that,
+unlike `crypto_sign`, excludes the actual message body. The result can
+be used with `crypto_sign_verify_detached`.
+
+The returned detached signature will be `nacl.crypto_sign_BYTES` in
+length.
+
+### nacl.crypto\_sign\_verify\_detached(detachedSignatureBin, msgBin, signerPublicKey) → (true || false)
+
+**WARNING: Experimental.** Given a "detached" signature from
+`crypto_sign_detached`, along with the original message and the
+signer's public signing key, returns `true` if the signature is valid,
+and `false` otherwise.
+
 ## Derived Keys
 
 **WARNING: Experimental**

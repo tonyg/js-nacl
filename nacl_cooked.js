@@ -354,6 +354,12 @@ var nacl = (function () {
 	return sm.extractBytes();
     }
 
+    function crypto_sign_detached(msg, sk) {
+	// WARNING: Experimental. Works for ed25519 but not necessarily other implementations.
+	var signed_msg = crypto_sign(msg, sk);
+	return signed_msg.subarray(0, nacl_raw._crypto_sign_BYTES);
+    }
+
     function crypto_sign_open(sm, pk) {
 	var sma = injectBytes(sm);
 	var pka = check_injectBytes("crypto_sign_open",
@@ -369,6 +375,14 @@ var nacl = (function () {
 	    free_all([sma, pka, m.address, mlen.address]);
 	    return null;
 	}
+    }
+
+    function crypto_sign_verify_detached(detached_signature, msg, pk) {
+	// WARNING: Experimental. Works for ed25519 but not necessarily other implementations.
+	var signed_msg = new Uint8Array(detached_signature.length + msg.length);
+	signed_msg.set(detached_signature, 0);
+	signed_msg.set(msg, detached_signature.length);
+	return crypto_sign_open(signed_msg, pk) !== null;
     }
 
     //---------------------------------------------------------------------------
@@ -481,7 +495,9 @@ var nacl = (function () {
 
     exports.crypto_sign_keypair = crypto_sign_keypair;
     exports.crypto_sign = crypto_sign;
+    exports.crypto_sign_detached = crypto_sign_detached;
     exports.crypto_sign_open = crypto_sign_open;
+    exports.crypto_sign_verify_detached = crypto_sign_verify_detached;
 
     exports.crypto_hash = crypto_hash;
     exports.crypto_hash_sha256 = crypto_hash_sha256;
