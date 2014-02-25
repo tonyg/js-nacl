@@ -5,6 +5,9 @@ NACLUNPACKED=nacl-$(NACLVERSION)
 PYTHON=python
 EMCC=`which emcc`
 
+test: all
+	npm test
+
 ## Builds well with emscripten of August 8, 2013 or newer and Clang/LLVM 3.2.
 all: lib
 

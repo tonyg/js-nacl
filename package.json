@@ -9,5 +9,11 @@
         "type": "git",
         "url": "https://github.com/tonyg/js-nacl.git"
     },
-    "engines": { "node": "*" }
+    "engines": { "node": "*" },
+    "scripts": {
+	"test": "./node_modules/mocha/bin/mocha --ui exports test"
+    },
+    "devDependencies": {
+	"mocha": ""
+    }
 }
