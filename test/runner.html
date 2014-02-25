@@ -16,6 +16,9 @@
       var assert = (function () {
         var exports = {};
         exports.fail = function (actual, expected, message, operator) {
+          if (typeof message === "undefined") {
+            message = "assertion failed: " + actual + " " + operator + " " + expected;
+          }
           throw ({ actual: actual, expected: expected, message: message, operator: operator });
         }
         exports.equal = function (actual, expected, message) {
