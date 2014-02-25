@@ -349,7 +349,7 @@ The input must be 32 bytes long. As
 binary seed" such as might be produced by sha256, or better yet,
 PBKDF2 or scrypt.
 
-Make sure to read and understand the warnings relating to passpharses,
+Make sure to read and understand the warnings relating to passphrases,
 PBKDF2 and scrypt at the beginning of this section.
 
 Compatible with [PyNaCl](https://github.com/warner/pynacl)'s
@@ -365,7 +365,7 @@ The input may be of any length. The input is hashed once with sha512,
 and the first 32 bytes of the result are taken as the 32-byte secret
 key, which is then passed to `nacl.crypto_box_keypair_from_raw_sk`.
 
-Make sure to read and understand the warnings relating to passpharses,
+Make sure to read and understand the warnings relating to passphrases,
 PBKDF2 and scrypt at the beginning of this section.
 
 Compatible with [racl](https://github.com/tonyg/racl)'s
@@ -380,7 +380,7 @@ The input must be 32 bytes long, and could be a random 32-byte value,
 or the output of sha256, or better yet, the output of PBKDF2 or
 scrypt.
 
-Make sure to read and understand the warnings relating to passpharses,
+Make sure to read and understand the warnings relating to passphrases,
 PBKDF2 and scrypt at the beginning of this section.
 
 Compatible with [racl](https://github.com/tonyg/racl)'s
