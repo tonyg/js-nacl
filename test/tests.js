@@ -1,7 +1,12 @@
-var nacl = require("../lib/nacl_factory.js").instantiate();
-var assert = require("assert");
-
-var suite = module.exports;
+if (typeof module !== 'undefined' && module.exports) {
+    // We are running in node
+    var nacl = require("../lib/nacl_factory.js").instantiate();
+    var assert = require("assert");
+    var suite = module.exports;
+} else {
+    // We are running in browser, and runner.html has set nacl, assert
+    // and suite up for us.
+}
 
 function wouldBeRandomInARealProgram(howmuch) {
     return new Uint8Array(howmuch);

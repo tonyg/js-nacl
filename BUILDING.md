@@ -11,6 +11,7 @@ policy is to include the generated javascript as a checked-in file.
     - Clang 3.2
     - Node.js 0.6.12 or newer
     - Python 2.7.3
+ - Node.js and npm to run the [mocha](http://visionmedia.github.io/mocha/)-based tests
 
 Within the `js-nacl` directory,
 
@@ -36,15 +37,9 @@ Within the `js-nacl` directory,
    infrastructure for making the Emscripten-compiled library
    parameterized in its source of randomness.
 
- - [`test_nacl_browser.html`](test_nacl_browser.html) is a simple
-   example/test of the code running in the browser.
+ - [`test/runner.html`](test/runner.html) runs the Mocha tests in the browser.
 
- - [`test_nacl_node.js`](test_nacl_node.js) is a simple example/test
-   for running in node.js: `node test_nacl_node.js`.
-
- - Both of the previous two depend upon
-   [`test_nacl.js`](test_nacl.js), which contains the actual test
-   script.
+ - [`test/tests.js`](test/tests.js) is the source code for the test cases themselves.
 
  - [`benchmark.html`](benchmark.html) and
    [`benchmark.js`](benchmark.js) are trivial speed measurements for
@@ -67,18 +62,21 @@ everything.
 
 Other Makefile targets:
 
+ - `make` or `make test`: builds the library if necessary and then
+   runs the test suite using node.js.
+
  - `make clean`: removes generated Javascript, but does not remove the
    unpacked and pre-processed `nacl` tarball contents.
 
  - `make veryclean`: as `make clean`, but also removes the `subnacl`
    directory and the contents of the `nacl` tarball.
 
- - `make` or `make all`: performs all the build steps.
+ - `make all`: performs all the build steps.
 
 If you for some reason need to use a different python than `python`,
 set the `PYTHON` makefile variable; for example,
 
-    make all PYTHON=python2.7
+    make PYTHON=python2.7
 
 Similarly, set `EMCC` to the path to your `emcc` binary if it's not on
 your `$PATH`.
