@@ -222,6 +222,14 @@ function TweetNaclC() {
 	this.xori(arr[(ofs << 1) + 0], arr[(ofs << 1) + 1]);
     };
 
+    Word.prototype.rori = function (imm) {
+	if (!imm) return;
+	var newlo = ((this.hi << (32 - imm)) | (this.lo >>> imm)) >>> 0;
+	var newhi = ((this.lo << (32 - imm)) | (this.hi >>> imm)) >>> 0;
+	this.lo = newlo;
+	this.hi = newhi;
+    };
+
     // -=-=-=- END int64array -=-=-=-
     ///////////////////////////////////////////////////////////////////////////
 

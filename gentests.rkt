@@ -1,7 +1,7 @@
 #lang racket
 ;; Generate test cases for signed 64-bit arithmetic in Javascript
 
-;; Signed 4-bit arithmetic: (- (expt 2 4) 1) = #b1111 = -1, (expt 2 3) = #b1000 = -8, #b0111 = 7
+(require rackunit)
 
 (define i64 (expt 2 64))
 (define i64-mask (- i64 1))
@@ -27,12 +27,26 @@
   (define v (chop32 x))
   (if (negative? v) (+ v i32) v))
 
+(define (bitwise-rotate n0 by0 limit)
+  (define by (modulo by0 limit))
+  (define mask (- (arithmetic-shift 1 limit) 1))
+  (define n (bitwise-and mask n0))
+  (bitwise-ior (bitwise-and mask (arithmetic-shift n by))
+	       (bitwise-and mask (arithmetic-shift n (- by limit)))))
+
 (define (i64+ x y) (chop64 (+ x y)))
 (define (i64- x y) (chop64 (- x y)))
 (define (i64* x y) (chop64 (* x y)))
+(define (i64^ x y) (chop64 (bitwise-xor x y)))
+
 (define (i64<< x i) (chop64 (arithmetic-shift x i)))
 (define (i64>> x i) (chop64 (arithmetic-shift x (- i))))
-(define (i64^ x y) (chop64 (bitwise-xor x y)))
+(define (i64ror x i) (chop64 (bitwise-rotate x (- i) 64)))
+
+(check-equal? (i64ror 2 1) 1)
+(check-equal? (i64ror 2 2) -9223372036854775808)
+(check-equal? (i64ror 2 62) 8)
+(check-equal? (i64ror 2 33) 4294967296)
 
 ;; Interesting non-negative edge-case 64-bit numbers
 (define interesting-non-negative-64
@@ -88,6 +102,7 @@
 		(xori ,i64^ 1 ,values)
 		(shli ,i64<< 1 ,only-shiftable)
 		(sari ,i64>> 1 ,only-shiftable)
+		(rori ,i64ror 1 ,only-shiftable)
 		))
 
 (let ((copying? #f))
