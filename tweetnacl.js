@@ -197,14 +197,14 @@ function TweetNaclC() {
     };
 
     Word.prototype.shli = function (imm) {
-	var mask = ((1 << imm) - 1) | 0;
-	this.hi = ((this.hi << imm) | ((this.lo >> (32 - imm)) & mask)) >>> 0;
+	if (!imm) return;
+	this.hi = ((this.hi << imm) | (this.lo >>> (32 - imm))) >>> 0;
 	this.lo = (this.lo << imm) >>> 0;
     };
 
     Word.prototype.sari = function (imm) {
-	var mask = imm ? ((1 << (32 - imm)) - 1) | 0 : -1;
-	this.lo = ((imm ? (this.hi << (32 - imm)) : 0) | ((this.lo >> imm) & mask)) >>> 0;
+	if (!imm) return;
+	this.lo = ((this.hi << (32 - imm)) | (this.lo >>> imm)) >>> 0;
 	this.hi = (this.hi >> imm) >>> 0;
     };
 
