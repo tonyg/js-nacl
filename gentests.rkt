@@ -32,6 +32,7 @@
 (define (i64* x y) (chop64 (* x y)))
 (define (i64<< x i) (chop64 (arithmetic-shift x i)))
 (define (i64>> x i) (chop64 (arithmetic-shift x (- i))))
+(define (i64^ x y) (chop64 (bitwise-xor x y)))
 
 ;; Interesting non-negative edge-case 64-bit numbers
 (define interesting-non-negative-64
@@ -80,9 +81,11 @@
 		(add ,i64+ 2 #f)
 		(sub ,i64- 2 #f)
 		(mul ,i64* 2 #f)
+		(xor ,i64^ 2 #f)
 		(addi ,i64+ 1 ,only-nonnegative)
 		(subi ,i64- 1 ,only-nonnegative)
 		(muli ,i64* 1 ,values)
+		(xori ,i64^ 1 ,values)
 		(shli ,i64<< 1 ,only-shiftable)
 		(sari ,i64>> 1 ,only-shiftable)
 		))

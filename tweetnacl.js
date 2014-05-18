@@ -208,6 +208,20 @@ function TweetNaclC() {
 	this.hi = (this.hi >> imm) >>> 0;
     };
 
+    Word.prototype.xori = function (lo, hi) {
+	hi = this.extendHi(lo, hi);
+	this.lo = (this.lo ^ (lo >>> 0)) >>> 0;
+	this.hi = (this.hi ^ (hi >>> 0)) >>> 0;
+    };
+
+    Word.prototype.xor = function (w) {
+	this.xori(w.lo, w.hi);
+    };
+
+    Word.prototype.xor_load = function (arr, ofs) {
+	this.xori(arr[(ofs << 1) + 0], arr[(ofs << 1) + 1]);
+    };
+
     // -=-=-=- END int64array -=-=-=-
     ///////////////////////////////////////////////////////////////////////////
 
