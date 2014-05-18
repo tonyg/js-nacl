@@ -208,6 +208,12 @@ function TweetNaclC() {
 	this.hi = (this.hi >> imm) >>> 0;
     };
 
+    Word.prototype.shri = function (imm) {
+	if (!imm) return;
+	this.lo = ((this.hi << (32 - imm)) | (this.lo >>> imm)) >>> 0;
+	this.hi = (this.hi >>> imm) >>> 0;
+    };
+
     Word.prototype.xori = function (lo, hi) {
 	hi = this.extendHi(lo, hi);
 	this.lo = (this.lo ^ (lo >>> 0)) >>> 0;
@@ -220,6 +226,20 @@ function TweetNaclC() {
 
     Word.prototype.xor_load = function (arr, ofs) {
 	this.xori(arr[(ofs << 1) + 0], arr[(ofs << 1) + 1]);
+    };
+
+    Word.prototype.andi = function (lo, hi) {
+	hi = this.extendHi(lo, hi);
+	this.lo = (this.lo & (lo >>> 0)) >>> 0;
+	this.hi = (this.hi & (hi >>> 0)) >>> 0;
+    };
+
+    Word.prototype.and = function (w) {
+	this.andi(w.lo, w.hi);
+    };
+
+    Word.prototype.and_load = function (arr, ofs) {
+	this.andi(arr[(ofs << 1) + 0], arr[(ofs << 1) + 1]);
     };
 
     Word.prototype.rori = function (imm) {
