@@ -42,6 +42,7 @@
 (define (i64<< x i) (chop64 (arithmetic-shift x i)))
 (define (i64>> x i) (chop64 (arithmetic-shift x (- i))))
 (define (i64ror x i) (chop64 (bitwise-rotate x (- i) 64)))
+(define (i64~ x) (chop64 (bitwise-not x)))
 
 (check-equal? (i64ror 2 1) 1)
 (check-equal? (i64ror 2 2) -9223372036854775808)
@@ -103,6 +104,7 @@
 		(shli ,i64<< 1 ,only-shiftable)
 		(sari ,i64>> 1 ,only-shiftable)
 		(rori ,i64ror 1 ,only-shiftable)
+		(not ,i64~ 1 #f)
 		))
 
 (let ((copying? #f))

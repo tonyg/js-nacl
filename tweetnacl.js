@@ -230,6 +230,11 @@ function TweetNaclC() {
 	this.hi = newhi;
     };
 
+    Word.prototype.not = function () {
+	this.lo = (~this.lo) >>> 0;
+	this.hi = (~this.hi) >>> 0;
+    };
+
     // -=-=-=- END int64array -=-=-=-
     ///////////////////////////////////////////////////////////////////////////
 
