@@ -91,53 +91,75 @@ function TweetNaclC() {
     function setlo32(o, i, v) { return o[(i << 1) + 0] = v; }
     function sethi32(o, i, v) { return o[(i << 1) + 1] = v; }
 
-    function movq(dest, dofs, src, sofs) {
-	setlo32(dest, dofs, getlo32(src, sofs));
-	sethi32(dest, dofs, gethi32(src, sofs));
+    function Word(lo, hi) {
+	this.lo = lo >>> 0;
+	this.hi = hi >>> 0;
     }
 
-    function sar32(v) {
-	if (v < 0) { throw { message: "attempt to sar32 a negative number" }; }
-	return (v / 4294967296) >>> 0;
-    }
+    Word.prototype.extendHi = function (lo, hi) {
+	if (typeof hi !== 'undefined') return hi;
+	return (lo < 0) ? -1 : 0;
+    };
 
-    function addq(dest, dofs, src1, sofs1, src2, sofs2) {
-	var lo = (getlo32(src1, sofs1) + getlo32(src2, sofs2));
-	var carry = sar32(lo);
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, ((gethi32(src1, sofs1) + gethi32(src2, sofs2)) + carry) >>> 0);
-    }
+    Word.prototype.zero = function () {
+	this.lo = 0;
+	this.hi = 0;
+    };
 
-    function u32not(x) { return (~x) >>> 0; }
+    Word.prototype.set = function (other) {
+	this.lo = other.lo;
+	this.hi = other.hi;
+    };
 
-    function subq(dest, dofs, src1, sofs1, src2, sofs2) {
-	var lo = (getlo32(src1, sofs1) + u32not(getlo32(src2, sofs2)) + 1);
-	var carry = sar32(lo);
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, ((gethi32(src1, sofs1) + u32not(gethi32(src2, sofs2))) + carry) >>> 0);
-    }
+    Word.prototype.load = function (arr, ofs) {
+	this.lo = arr[(ofs << 1) + 0];
+	this.hi = arr[(ofs << 1) + 1];
+    };
 
-    function addqi(dest, dofs, src, sofs, imm32) {
-	var lo = (getlo32(src, sofs) + imm32);
-	var carry = sar32(lo);
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, (gethi32(src, sofs) + carry) >>> 0);
-    }
+    Word.prototype.store = function (arr, ofs) {
+	arr[(ofs << 1) + 0] = this.lo;
+	arr[(ofs << 1) + 1] = this.hi;
+    };
 
-    function subqi(dest, dofs, src1, sofs1, imm32) {
-	var lo = (getlo32(src1, sofs1) + u32not(imm32) + 1);
-	var hibits = -1 >>> 0;
-	var carry = sar32(lo);
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, (gethi32(src1, sofs1) + hibits + carry) >>> 0);
-    }
+    Word.prototype.addi = function (lo, hi) {
+	hi = this.extendHi(lo, hi);
+	var oldlo = this.lo >>> 0;
+	this.lo = (this.lo + (lo >>> 0)) >>> 0;
+	var carry = (this.lo < oldlo) ? 1 : 0;
+	this.hi = (this.hi + (hi >>> 0) + carry) >>> 0;
+    };
 
-    function mul64(dest, dofs, al, ah, bl, bh) {
-	var a0 = al & 0xFFFF
-	var a1 = al >>> 16 & 0xFFFF;
-	var a2 = ah & 0xFFFF
-	var a3 = ah >>> 16 & 0xFFFF;
+    Word.prototype.add = function (w) {
+	this.addi(w.lo, w.hi);
+    };
 
+    Word.prototype.add_load = function (arr, ofs) {
+	this.addi(arr[(ofs << 1) + 0], arr[(ofs << 1) + 1]);
+    };
+
+    Word.prototype.subi = function (lo, hi) {
+	hi = this.extendHi(lo, hi);
+	var oldlo = this.lo >>> 0;
+	this.lo = (this.lo - (lo >>> 0)) >>> 0;
+	var carry = (this.lo > oldlo) ? -1 : 0;
+	this.hi = (this.hi - (hi >>> 0) + carry) >>> 0;
+    };
+
+    Word.prototype.sub = function (w) {
+	this.subi(w.lo, w.hi);
+    };
+
+    Word.prototype.sub_load = function (arr, ofs) {
+	this.subi(arr[(ofs << 1) + 0], arr[(ofs << 1) + 1]);
+    };
+
+    Word.prototype.muli = function (bl, bh) {
+	var a0 = this.lo & 0xFFFF
+	var a1 = this.lo >>> 16 & 0xFFFF;
+	var a2 = this.hi & 0xFFFF
+	var a3 = this.hi >>> 16 & 0xFFFF;
+
+	bh = this.extendHi(bl, bh);
 	var b0 = bl & 0xFFFF
 	var b1 = bl >>> 16 & 0xFFFF;
 	var b2 = bh & 0xFFFF
@@ -162,67 +184,29 @@ function TweetNaclC() {
 	var r2 = v20 + v11 + v02 + ((r1 / 65536) >>> 0);
 	var r3 = v30 + v21 + v12 + v03 + ((r2 / 65536) >>> 0);
 
-	var lo = (((r0 & 0xffff) | (r1 << 16)) >>> 0);
-	var hi = ((r2 & 0xffff) | (r3 << 16) >>> 0);
+	this.lo = (((r0 & 0xffff) | (r1 << 16)) >>> 0) >>> 0;
+	this.hi = ((r2 & 0xffff) | (r3 << 16) >>> 0) >>> 0;
+    };
 
-	setlo32(dest, dofs, lo);
-	sethi32(dest, dofs, hi);
-    }
+    Word.prototype.mul = function (w) {
+	this.muli(w.lo, w.hi);
+    };
 
-    function muladdq(dest, dofs, src0, sofs0, src1, sofs1, src2, sofs2) {
-	var cl = getlo32(src0, sofs0);
-	var ch = gethi32(src0, sofs0);
+    Word.prototype.mul_load = function (arr, ofs) {
+	this.muli(arr[(ofs << 1) + 0], arr[(ofs << 1) + 1]);
+    };
 
-	var al = getlo32(src1, sofs1);
-	var ah = gethi32(src1, sofs1);
+    Word.prototype.shli = function (imm) {
+	var mask = ((1 << imm) - 1) | 0;
+	this.hi = ((this.hi << imm) | ((this.lo >> (32 - imm)) & mask)) >>> 0;
+	this.lo = (this.lo << imm) >>> 0;
+    };
 
-	var bl = getlo32(src2, sofs2);
-	var bh = gethi32(src2, sofs2);
-
-	mul64(dest, dofs, al, ah, bl, bh);
-	var lo = getlo32(dest, dofs) + cl;
-	var carry = sar32(lo);
-	var hi = gethi32(dest, dofs) + ch + carry;
-
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, hi >>> 0);
-    }
-
-    // D = S0 + (S * IMM)
-    function muladdqi(dest, dofs, src0, sofs0, src, sofs, imm32) {
-	var cl = getlo32(src0, sofs0);
-	var ch = gethi32(src0, sofs0);
-
-	mul64(dest, dofs,
-	      getlo32(src, sofs), gethi32(src, sofs),
-	      imm32 >>> 0, imm32 < 0 ? -1 >>> 0 : 0);
-	var lo = getlo32(dest, dofs) + cl;
-	var carry = sar32(lo);
-	var hi = gethi32(dest, dofs) + ch + carry;
-
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, hi >>> 0);
-    }
-
-    function shlqi(dest, dofs, src, sofs, imm32) {
-	var mask = ((1 << imm32) - 1) | 0;
-	var srclo = getlo32(src, sofs);
-	var srchi = gethi32(src, sofs);
-	var lo = (srclo << imm32);
-	var hi = (srchi << imm32) | ((srclo >> (32 - imm32)) & mask);
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, hi >>> 0);
-    }
-
-    function sarqi(dest, dofs, src, sofs, imm32) {
-	var mask = imm32 ? ((1 << (32 - imm32)) - 1) | 0 : -1;
-	var srclo = getlo32(src, sofs);
-	var srchi = gethi32(src, sofs) | 0;
-	var lo = (imm32 ? (srchi << (32 - imm32)) : 0) | ((srclo >> imm32) & mask);
-	var hi = (srchi >> imm32);
-	setlo32(dest, dofs, lo >>> 0);
-	sethi32(dest, dofs, hi >>> 0);
-    }
+    Word.prototype.sari = function (imm) {
+	var mask = imm ? ((1 << (32 - imm)) - 1) | 0 : -1;
+	this.lo = ((imm ? (this.hi << (32 - imm)) : 0) | ((this.lo >> imm) & mask)) >>> 0;
+	this.hi = (this.hi >> imm) >>> 0;
+    };
 
     // -=-=-=- END int64array -=-=-=-
     ///////////////////////////////////////////////////////////////////////////
@@ -546,26 +530,36 @@ function TweetNaclC() {
     // curve25519
 
     function car25519(o) {
-	var c = new_int64array(2); /* use [0] as c (in the C code) and [1] as scratch */
+	var c = new Word();
+	var tmp = new Word();
 	for (var i = 0; i < 16; i++) {
-	    addqi(o, i, o, i, 1 << 16);
-	    sarqi(c, 0, o, i, 16);
+	    c.load(o, i);
+	    c.addi(1 << 16);
+	    c.store(o, i);
+	    c.sari(16);
 	    if (i < 15) {
-		addq(o, i+1, o, i+1, c, 0);
-		subqi(o, i+1, o, i+1, 1);
+		tmp.load(o, i+1);
+		tmp.add(c);
+		tmp.subi(1);
+		tmp.store(o, i+1);
 	    } else {
-		subqi(c, 1, c, 0, 1);
-		muladdqi(o, 0, o, 0, c, 1, 38);
+		tmp.set(c);
+		tmp.subi(1);
+		tmp.muli(38);
+		tmp.add_load(o, 0);
+		tmp.store(o, 0);
 	    }
-	    shlqi(c, 1, c, 0, 16);
-	    subq(o, i, o, i, c, 1);
+	    tmp.load(o, i);
+	    c.shli(16);
+	    tmp.sub(c);
+	    tmp.store(o, i);
 	}
     }
 
     /* TODO: b might be better off as a boolean */
     function sel25519(p,q,b) {
 	var tlo, thi, i, clo, chi;
-	clo = u32not(b-1);
+	clo = (~(b-1)) >>> 0;
 	chi = (clo >>> 31) ? 0xffffffff : 0;
 	// dumpbuf("sel25519 p", p);
 	// dumpbuf("sel25519 q", q);
@@ -583,19 +577,26 @@ function TweetNaclC() {
 	var i, j, b;
 	var m = new_gf([]);
 	var t = copy_gf(n);
+	var tmp = new Word();
 
 	car25519(t);
 	car25519(t);
 	car25519(t);
 	for (j = 0; j < 2; j++) {
-	    subqi(m, 0, t, 0, 0xffed);
+	    tmp.load(t, 0);
+	    tmp.subi(0xffed);
+	    tmp.store(m, 0);
 	    for(i=1;i<15;i++) {
-		subqi(m, i, t, i, (0xffff + ((getlo32(m, i-1) >> 16) & 1)));
+		tmp.load(t, i);
+		tmp.subi(0xffff + ((getlo32(m, i-1) >> 16) & 1));
+		tmp.store(m, i);
 		setlo32(m, i-1, getlo32(m, i-1) & 0xffff);
 		sethi32(m, i-1, 0);
 	    }
 
-	    subqi(m, 15, t, 15, (0x7fff + ((getlo32(m, 14) >> 16) & 1)));
+	    tmp.load(t, 15);
+	    tmp.subi(0x7fff + ((getlo32(m, 14) >> 16) & 1));
+	    tmp.store(m, 15);
 	    b = ((getlo32(m, 15) >> 16) & 1);
 	    setlo32(m, 14, getlo32(m, 14) & 0xffff);
 	    sethi32(m, 14, 0);
@@ -632,21 +633,38 @@ function TweetNaclC() {
     }
 
     function A(o,a,b) {
-	for (var i = 0; i < 16; i++) addq(o, i, a, i, b, i);
+	var tmp = new Word();
+	for (var i = 0; i < 16; i++) {
+	    tmp.load(a, i);
+	    tmp.add_load(b, i);
+	    tmp.store(o, i);
+	}
     }
 
     function Z(o,a,b) {
-	for (var i = 0; i < 16; i++) subq(o, i, a, i, b, i);
+	var tmp = new Word();
+	for (var i = 0; i < 16; i++) {
+	    tmp.load(a, i);
+	    tmp.sub_load(b, i);
+	    tmp.store(o, i);
+	}
     }
 
     function M(o,a,b) {
 	var t = new_int64array(31);
+	var tmp = new Word();
 	var i, j;
 	for (i = 0; i < 16; i++) for (j = 0; j < 16; j++) {
-	    muladdq(t, i+j, t, i+j, a, i, b, j);
+	    tmp.load(a, i);
+	    tmp.mul_load(b, j);
+	    tmp.add_load(t, i+j);
+	    tmp.store(t, i+j);
 	}
 	for (i = 0; i < 15; i++) {
-	    muladdqi(t, i, t, i, t, i+16, 38);
+	    tmp.load(t, i+16);
+	    tmp.muli(38);
+	    tmp.add_load(t, i);
+	    tmp.store(t, i);
 	}
 	for (i = 0; i < 32 /* ! not 16 */; i++) {
 	    o[i]=t[i];

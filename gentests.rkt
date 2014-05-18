@@ -30,6 +30,8 @@
 (define (i64+ x y) (chop64 (+ x y)))
 (define (i64- x y) (chop64 (- x y)))
 (define (i64* x y) (chop64 (* x y)))
+(define (i64<< x i) (chop64 (arithmetic-shift x i)))
+(define (i64>> x i) (chop64 (arithmetic-shift x (- i))))
 
 ;; Interesting non-negative edge-case 64-bit numbers
 (define interesting-non-negative-64
@@ -64,29 +66,6 @@
 ;; Interesting edge-case 32-bit numbers
 (define interesting-32 (filter (lambda (n) (< (abs n) (expt 2 32))) interesting-64))
 
-(define DEST #f)
-(define SOURCES #f)
-
-(define (reset!)
-  (set! DEST (vector 0 0 0))
-  (set! SOURCES (list (vector 0 0 0)
-		      (vector 0 0 0)
-		      (vector 0 0 0))))
-
-(define (D! v) (vector-set! DEST 1 (chop64 v)))
-(define (S n) (vector-ref (list-ref SOURCES n) 1))
-
-(define (movq) (D! (S 0)))
-(define (addq) (D! (i64+ (S 0) (S 1))))
-(define (subq) (D! (i64- (S 0) (S 1))))
-(define (muladdq) (D! (i64+ (S 0) (i64* (S 1) (S 2)))))
-
-(define (addqi i) (D! (i64+ (S 0) i)))
-(define (subqi i) (D! (i64- (S 0) i)))
-(define (muladdqi i) (D! (i64+ (S 0) (i64* (S 1) i))))
-(define (shlqi i) (D! (chop64 (arithmetic-shift (S 0) (modulo i 64)))))
-(define (sarqi i) (D! (chop64 (arithmetic-shift (S 0) (- (modulo i 64))))))
-
 (define (compute-inputs input-count)
   (if (zero? input-count)
       (list '())
@@ -94,26 +73,19 @@
 	(append-map (lambda (n) (map (lambda (ts) (cons n ts)) tails))
 		    interesting-64))))
 
-(define (apply-input! input)
-  (reset!)
-  (for [(n (in-naturals)) (i input)]
-    (vector-set! (list-ref SOURCES n) 1 (chop64 i))))
-
 (define (only-nonnegative x) (and (not (negative? x)) x))
 (define (only-shiftable x) (and (not (negative? x)) (modulo x 32)))
 
 (define cases `(
-		(movq ,movq 1 #f)
-		(addq ,addq 2 #f)
-		(subq ,subq 2 #f)
-		(addqi ,addqi 1 ,only-nonnegative)
-		(subqi ,subqi 1 ,only-nonnegative)
-		(shlqi ,shlqi 1 ,only-shiftable)
-		(sarqi ,sarqi 1 ,only-shiftable)
-		(muladdq ,muladdq 3 #f)
-		(muladdqi ,muladdqi 2 ,values)
+		(add ,i64+ 2 #f)
+		(sub ,i64- 2 #f)
+		(mul ,i64* 2 #f)
+		(addi ,i64+ 1 ,only-nonnegative)
+		(subi ,i64- 1 ,only-nonnegative)
+		(muli ,i64* 1 ,values)
+		(shli ,i64<< 1 ,only-shiftable)
+		(sari ,i64>> 1 ,only-shiftable)
 		))
-
 
 (let ((copying? #f))
   (for [(line (in-lines (open-input-file "tweetnacl.js")))]
@@ -122,47 +94,36 @@
      [(regexp-match #px"-=-=-=- END int64array -=-=-=-" line) (set! copying? #f)]
      [copying? (display line) (newline)])))
 
-(printf "var DEST, SOURCES, ok;\n")
+(printf "var DEST, ok;\n")
 (for [(c cases)]
-  (match-define (list name proc input-count imm-filter) c)
+  (match-define (list method-name proc input-count imm-filter) c)
   (for [(input (compute-inputs input-count))]
-    (define (print-test! tail-inputs)
+    (define (word-exp v)
+      (define lo (chop32 v))
+      (define hi (chop32 (arithmetic-shift v -32)))
+      (format "new Word(~a, ~a)" lo hi))
+    (define (print-test! expected tail-inputs)
       (printf "\n")
-      (printf "DEST = new_int64array(3);\n")
-      (printf "SOURCES = [~a];\n"
-	      (string-join (make-list input-count "new_int64array(3)") ","))
-      (for [(n input-count)]
-	(printf "setlo32(SOURCES[~a], 1, ~a);\n" n (chop32 (S n)))
-	(printf "sethi32(SOURCES[~a], 1, ~a);\n" n (chop32 (arithmetic-shift (S n) -32))))
-      (define args
-	(string-join (flatten (list (list "DEST" "1")
-				    (for/list [(n input-count)] (list (format "SOURCES[~a]" n) "1"))
-				    (map number->string tail-inputs)))
-		     ","))
-      (define expected (vector-ref DEST 1))
+      (printf "DEST = ~a;\n" (word-exp (car input)))
+      (printf "DEST.~a(~a);\n"
+	      method-name
+	      (string-join
+	       (append (for/list [(i (cdr input))] (word-exp i))
+		       (map number->string tail-inputs))
+	       ","))
       (define elo (chop32u expected))
       (define ehi (chop32u (arithmetic-shift expected -32)))
-      ;; (printf "console.log('~a');\n" name)
-      (printf "~a(~a);\n" name args)
       (printf "ok = true;\n")
-      (printf "ok = ok && (getlo32(DEST, 0) == 0);\n")
-      (printf "ok = ok && (gethi32(DEST, 0) == 0);\n")
-      (printf "ok = ok && (getlo32(DEST, 1) == ~a);\n" elo)
-      (printf "ok = ok && (gethi32(DEST, 1) == ~a);\n" ehi)
-      (printf "ok = ok && (getlo32(DEST, 2) == 0);\n")
-      (printf "ok = ok && (gethi32(DEST, 2) == 0);\n")
-      (printf "if (!ok) { console.log(~v, ~a, ~a, DEST[2], DEST[3]); }\n"
-	      (format "~a: ~a ~a --> ~a" name input tail-inputs expected)
+      (printf "ok = ok && DEST.lo === ~a;\n" elo)
+      (printf "ok = ok && DEST.hi === ~a;\n" ehi)
+      (printf "if (!ok) { console.log(~v, ~a, ~a, DEST.lo, DEST.hi); }\n"
+	      (format "~a: ~a ~a --> ~a" method-name input tail-inputs expected)
 	      elo
 	      ehi))
     (if imm-filter
 	(for [(imm interesting-32)]
 	  (define filtered-imm (imm-filter imm))
 	  (when filtered-imm
-	    (apply-input! input)
-	    (proc filtered-imm)
-	    (print-test! (list filtered-imm))))
-	(begin
-	  (apply-input! input)
-	  (proc)
-	  (print-test! '())))))
+	    (print-test! (apply proc (append input (list filtered-imm)))
+			 (list filtered-imm))))
+	(print-test! (apply proc input) '()))))
