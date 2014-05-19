@@ -851,116 +851,279 @@ function TweetNaclC() {
     }
 
     ///////////////////////////////////////////////////////////////////////////
+    // sha512
 
-/*
-
-static u64 R(u64 x,int c) { return (x >> c) | (x << (64 - c)); }
-static u64 Ch(u64 x,u64 y,u64 z) { return (x & y) ^ (~x & z); }
-static u64 Maj(u64 x,u64 y,u64 z) { return (x & y) ^ (x & z) ^ (y & z); }
-static u64 Sigma0(u64 x) { return R(x,28) ^ R(x,34) ^ R(x,39); }
-static u64 Sigma1(u64 x) { return R(x,14) ^ R(x,18) ^ R(x,41); }
-static u64 sigma0(u64 x) { return R(x, 1) ^ R(x, 8) ^ (x >> 7); }
-static u64 sigma1(u64 x) { return R(x,19) ^ R(x,61) ^ (x >> 6); }
-
-static const u64 K[80] = 
-{
-  0x428a2f98d728ae22ULL, 0x7137449123ef65cdULL, 0xb5c0fbcfec4d3b2fULL, 0xe9b5dba58189dbbcULL,
-  0x3956c25bf348b538ULL, 0x59f111f1b605d019ULL, 0x923f82a4af194f9bULL, 0xab1c5ed5da6d8118ULL,
-  0xd807aa98a3030242ULL, 0x12835b0145706fbeULL, 0x243185be4ee4b28cULL, 0x550c7dc3d5ffb4e2ULL,
-  0x72be5d74f27b896fULL, 0x80deb1fe3b1696b1ULL, 0x9bdc06a725c71235ULL, 0xc19bf174cf692694ULL,
-  0xe49b69c19ef14ad2ULL, 0xefbe4786384f25e3ULL, 0x0fc19dc68b8cd5b5ULL, 0x240ca1cc77ac9c65ULL,
-  0x2de92c6f592b0275ULL, 0x4a7484aa6ea6e483ULL, 0x5cb0a9dcbd41fbd4ULL, 0x76f988da831153b5ULL,
-  0x983e5152ee66dfabULL, 0xa831c66d2db43210ULL, 0xb00327c898fb213fULL, 0xbf597fc7beef0ee4ULL,
-  0xc6e00bf33da88fc2ULL, 0xd5a79147930aa725ULL, 0x06ca6351e003826fULL, 0x142929670a0e6e70ULL,
-  0x27b70a8546d22ffcULL, 0x2e1b21385c26c926ULL, 0x4d2c6dfc5ac42aedULL, 0x53380d139d95b3dfULL,
-  0x650a73548baf63deULL, 0x766a0abb3c77b2a8ULL, 0x81c2c92e47edaee6ULL, 0x92722c851482353bULL,
-  0xa2bfe8a14cf10364ULL, 0xa81a664bbc423001ULL, 0xc24b8b70d0f89791ULL, 0xc76c51a30654be30ULL,
-  0xd192e819d6ef5218ULL, 0xd69906245565a910ULL, 0xf40e35855771202aULL, 0x106aa07032bbd1b8ULL,
-  0x19a4c116b8d2d0c8ULL, 0x1e376c085141ab53ULL, 0x2748774cdf8eeb99ULL, 0x34b0bcb5e19b48a8ULL,
-  0x391c0cb3c5c95a63ULL, 0x4ed8aa4ae3418acbULL, 0x5b9cca4f7763e373ULL, 0x682e6ff3d6b2b8a3ULL,
-  0x748f82ee5defb2fcULL, 0x78a5636f43172f60ULL, 0x84c87814a1f0ab72ULL, 0x8cc702081a6439ecULL,
-  0x90befffa23631e28ULL, 0xa4506cebde82bde9ULL, 0xbef9a3f7b2c67915ULL, 0xc67178f2e372532bULL,
-  0xca273eceea26619cULL, 0xd186b8c721c0c207ULL, 0xeada7dd6cde0eb1eULL, 0xf57d4f7fee6ed178ULL,
-  0x06f067aa72176fbaULL, 0x0a637dc5a2c898a6ULL, 0x113f9804bef90daeULL, 0x1b710b35131c471bULL,
-  0x28db77f523047d84ULL, 0x32caab7b40c72493ULL, 0x3c9ebe0a15c9bebcULL, 0x431d67c49c100d4cULL,
-  0x4cc5d4becb3e42b6ULL, 0x597f299cfc657e2aULL, 0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL
-};
-
-// Loads a BIG-ENDIAN 64-bit UNSIGNED word from the given pointer
-static u64 dl64(const u8 *x);
-
-// Stores a BIG-ENDIAN 64-bit UNSIGNED word to the given pointer
-static void ts64(u8 *x,u64 u);
-
-int crypto_hashblocks(u8 *x,const u8 *m,u64 n)
-{
-  u64 z[8],b[8],a[8],w[16],t;
-  int i,j;
-
-    for (i = 0; i < 8; i++) z[i] = a[i] = dl64(x + 8 * i);
-
-  while (n >= 128) {
-      for (i = 0; i < 16; i++) w[i] = dl64(m + 8 * i);
-
-      for (i = 0; i < 80; i++) {
-	  for (j = 0; j < 8; j++) b[j] = a[j];
-      t = a[7] + Sigma1(a[4]) + Ch(a[4],a[5],a[6]) + K[i] + w[i%16];
-      b[7] = t + Sigma0(a[0]) + Maj(a[0],a[1],a[2]);
-      b[3] += t;
-	  for (j = 0; j < 8; j++) a[(j+1)%8] = b[j];
-      if (i%16 == 15)
-	  for (j = 0; j < 16; j++)
-	  w[j] += w[(j+9)%16] + sigma0(w[(j+1)%16]) + sigma1(w[(j+14)%16]);
+    // static u64 Ch(u64 x,u64 y,u64 z) { return (x & y) ^ (~x & z); }
+    function Ch(xa, xo, ya, yo, za, zo) {
+	var t1 = new Word();
+	var t2 = new Word();
+	t1.load(xa, xo);
+	t1.and_load(ya, yo);
+	t2.load(xa, xo);
+	t2.not();
+	t2.and_load(za, zo);
+	t1.xor(t2);
+	return t1;
     }
 
-      for (i = 0; i < 8; i++) { a[i] += z[i]; z[i] = a[i]; }
+    // static u64 Maj(u64 x,u64 y,u64 z) { return (x & y) ^ (x & z) ^ (y & z); }
+    function Maj(xa, xo, ya, yo, za, zo) {
+	var t1 = new Word();
+	var t2 = new Word();
+	t1.load(xa, xo);
+	t1.and_load(ya, yo);
+	t2.load(xa, xo);
+	t2.and_load(za, zo);
+	t1.xor(t2);
+	t2.load(ya, yo);
+	t2.and_load(za, zo);
+	t1.xor(t2);
+	return t1;
+    }
 
-    m += 128;
-    n -= 128;
-  }
+    // static u64 Sigma0(u64 x) { return R(x,28) ^ R(x,34) ^ R(x,39); }
+    function Sigma0(arr, ofs) {
+	var t1 = new Word();
+	var t2 = new Word();
+	t1.load(arr, ofs);
+	t1.rori(28);
+	t2.load(arr, ofs);
+	t2.rori(34);
+	t1.xor(t2);
+	t2.load(arr, ofs);
+	t2.rori(39);
+	t1.xor(t2);
+	return t1;
+    }
 
-    for (i = 0; i < 8; i++) ts64(x+8*i,z[i]);
+    // static u64 Sigma1(u64 x) { return R(x,14) ^ R(x,18) ^ R(x,41); }
+    function Sigma1(arr, ofs) {
+	var t1 = new Word();
+	var t2 = new Word();
+	t1.load(arr, ofs);
+	t1.rori(14);
+	t2.load(arr, ofs);
+	t2.rori(18);
+	t1.xor(t2);
+	t2.load(arr, ofs);
+	t2.rori(41);
+	t1.xor(t2);
+	return t1;
+    }
 
-  return n;
-}
+    // static u64 sigma0(u64 x) { return R(x, 1) ^ R(x, 8) ^ (x >> 7); }
+    function sigma0(arr, ofs) {
+	var t1 = new Word();
+	var t2 = new Word();
+	t1.load(arr, ofs);
+	t1.rori(1);
+	t2.load(arr, ofs);
+	t2.rori(8);
+	t1.xor(t2);
+	t2.load(arr, ofs);
+	t2.shri(7);
+	t1.xor(t2);
+	return t1;
+    }
 
-static const u8 iv[64] = {
-  0x6a,0x09,0xe6,0x67,0xf3,0xbc,0xc9,0x08,
-  0xbb,0x67,0xae,0x85,0x84,0xca,0xa7,0x3b,
-  0x3c,0x6e,0xf3,0x72,0xfe,0x94,0xf8,0x2b,
-  0xa5,0x4f,0xf5,0x3a,0x5f,0x1d,0x36,0xf1,
-  0x51,0x0e,0x52,0x7f,0xad,0xe6,0x82,0xd1,
-  0x9b,0x05,0x68,0x8c,0x2b,0x3e,0x6c,0x1f,
-  0x1f,0x83,0xd9,0xab,0xfb,0x41,0xbd,0x6b,
-  0x5b,0xe0,0xcd,0x19,0x13,0x7e,0x21,0x79
-} ;
+    // static u64 sigma1(u64 x) { return R(x,19) ^ R(x,61) ^ (x >> 6); }
+    function sigma1(arr, ofs) {
+	var t1 = new Word();
+	var t2 = new Word();
+	t1.load(arr, ofs);
+	t1.rori(19);
+	t2.load(arr, ofs);
+	t2.rori(61);
+	t1.xor(t2);
+	t2.load(arr, ofs);
+	t2.shri(6);
+	t1.xor(t2);
+	return t1;
+    }
 
-int crypto_hash(u8 *out,const u8 *m,u64 n)
-{
-  u8 h[64],x[256];
-  u64 i,b = n;
+    var K = [
+	new Word(0xd728ae22, 0x428a2f98), new Word(0x23ef65cd, 0x71374491),
+	new Word(0xec4d3b2f, 0xb5c0fbcf), new Word(0x8189dbbc, 0xe9b5dba5),
+	new Word(0xf348b538, 0x3956c25b), new Word(0xb605d019, 0x59f111f1),
+	new Word(0xaf194f9b, 0x923f82a4), new Word(0xda6d8118, 0xab1c5ed5),
+	new Word(0xa3030242, 0xd807aa98), new Word(0x45706fbe, 0x12835b01),
+	new Word(0x4ee4b28c, 0x243185be), new Word(0xd5ffb4e2, 0x550c7dc3),
+	new Word(0xf27b896f, 0x72be5d74), new Word(0x3b1696b1, 0x80deb1fe),
+	new Word(0x25c71235, 0x9bdc06a7), new Word(0xcf692694, 0xc19bf174),
+	new Word(0x9ef14ad2, 0xe49b69c1), new Word(0x384f25e3, 0xefbe4786),
+	new Word(0x8b8cd5b5, 0x0fc19dc6), new Word(0x77ac9c65, 0x240ca1cc),
+	new Word(0x592b0275, 0x2de92c6f), new Word(0x6ea6e483, 0x4a7484aa),
+	new Word(0xbd41fbd4, 0x5cb0a9dc), new Word(0x831153b5, 0x76f988da),
+	new Word(0xee66dfab, 0x983e5152), new Word(0x2db43210, 0xa831c66d),
+	new Word(0x98fb213f, 0xb00327c8), new Word(0xbeef0ee4, 0xbf597fc7),
+	new Word(0x3da88fc2, 0xc6e00bf3), new Word(0x930aa725, 0xd5a79147),
+	new Word(0xe003826f, 0x06ca6351), new Word(0x0a0e6e70, 0x14292967),
+	new Word(0x46d22ffc, 0x27b70a85), new Word(0x5c26c926, 0x2e1b2138),
+	new Word(0x5ac42aed, 0x4d2c6dfc), new Word(0x9d95b3df, 0x53380d13),
+	new Word(0x8baf63de, 0x650a7354), new Word(0x3c77b2a8, 0x766a0abb),
+	new Word(0x47edaee6, 0x81c2c92e), new Word(0x1482353b, 0x92722c85),
+	new Word(0x4cf10364, 0xa2bfe8a1), new Word(0xbc423001, 0xa81a664b),
+	new Word(0xd0f89791, 0xc24b8b70), new Word(0x0654be30, 0xc76c51a3),
+	new Word(0xd6ef5218, 0xd192e819), new Word(0x5565a910, 0xd6990624),
+	new Word(0x5771202a, 0xf40e3585), new Word(0x32bbd1b8, 0x106aa070),
+	new Word(0xb8d2d0c8, 0x19a4c116), new Word(0x5141ab53, 0x1e376c08),
+	new Word(0xdf8eeb99, 0x2748774c), new Word(0xe19b48a8, 0x34b0bcb5),
+	new Word(0xc5c95a63, 0x391c0cb3), new Word(0xe3418acb, 0x4ed8aa4a),
+	new Word(0x7763e373, 0x5b9cca4f), new Word(0xd6b2b8a3, 0x682e6ff3),
+	new Word(0x5defb2fc, 0x748f82ee), new Word(0x43172f60, 0x78a5636f),
+	new Word(0xa1f0ab72, 0x84c87814), new Word(0x1a6439ec, 0x8cc70208),
+	new Word(0x23631e28, 0x90befffa), new Word(0xde82bde9, 0xa4506ceb),
+	new Word(0xb2c67915, 0xbef9a3f7), new Word(0xe372532b, 0xc67178f2),
+	new Word(0xea26619c, 0xca273ece), new Word(0x21c0c207, 0xd186b8c7),
+	new Word(0xcde0eb1e, 0xeada7dd6), new Word(0xee6ed178, 0xf57d4f7f),
+	new Word(0x72176fba, 0x06f067aa), new Word(0xa2c898a6, 0x0a637dc5),
+	new Word(0xbef90dae, 0x113f9804), new Word(0x131c471b, 0x1b710b35),
+	new Word(0x23047d84, 0x28db77f5), new Word(0x40c72493, 0x32caab7b),
+	new Word(0x15c9bebc, 0x3c9ebe0a), new Word(0x9c100d4c, 0x431d67c4),
+	new Word(0xcb3e42b6, 0x4cc5d4be), new Word(0xfc657e2a, 0x597f299c),
+	new Word(0x3ad6faec, 0x5fcb6fab), new Word(0x4a475817, 0x6c44198c)
+    ];
 
-    for (i = 0; i < 64; i++) h[i] = iv[i];
+    // Loads a BIG-ENDIAN 64-bit UNSIGNED word from the given pointer
+    // static u64 dl64(const u8 *x);
+    function dl64(x, offset) {
+	var hi = (x[offset+0] << 24) | (x[offset+1] << 16) | (x[offset+2] << 8) | x[offset+3];
+	var lo = (x[offset+4] << 24) | (x[offset+5] << 16) | (x[offset+6] << 8) | x[offset+7];
+	return new Word(lo, hi);
+    }
 
-  crypto_hashblocks(h,m,n);
-  m += n;
-  n &= 127;
-  m -= n;
+    // Stores a BIG-ENDIAN 64-bit UNSIGNED word to the given pointer
+    // static void ts64(u8 *x,u64 u);
+    function ts64(x, offset, u) {
+	x[offset+0] = (u.hi >>> 24) & 0xff;
+	x[offset+1] = (u.hi >>> 16) & 0xff;
+	x[offset+2] = (u.hi >>> 8) & 0xff;
+	x[offset+3] = (u.hi >>> 0) & 0xff;
+	x[offset+4] = (u.lo >>> 24) & 0xff;
+	x[offset+5] = (u.lo >>> 16) & 0xff;
+	x[offset+6] = (u.lo >>> 8) & 0xff;
+	x[offset+7] = (u.lo >>> 0) & 0xff;
+    }
 
-    for (i = 0; i < 256; i++) x[i] = 0;
-    for (i = 0; i < n; i++) x[i] = m[i];
-  x[n] = 128;
+    function crypto_hashblocks(x,m,n) {
+	// u8 *x,const u8 *m,u64 n
+	var z = new_int64array(8);
+	var b = new_int64array(8);
+	var a = new_int64array(8);
+	var w = new_int64array(16);
+	var t = new Word();
+	var tmp;
+	var i,j;
+	var offset = 0;
 
-  n = 256-128*(n<112);
-  x[n-9] = b >> 61;
-  ts64(x+n-8,b<<3);
-  crypto_hashblocks(h,x,n);
+	for (i = 0; i < 8; i++) {
+	    tmp = dl64(x, 8 * i);
+	    tmp.store(z, i);
+	    tmp.store(a, i);
+	}
 
-    for (i = 0; i < 64; i++) out[i] = h[i];
+	tmp = new Word();
+	while (n >= 128) {
+	    for (i = 0; i < 16; i++) {
+		dl64(m, offset + (8 * i)).store(w, i);
+	    }
 
-  return 0;
-}
+	    for (i = 0; i < 80; i++) {
+		b.set(a);
 
+		t.load(a, 7);
+		t.add(Sigma1(a, 4))
+		t.add(Ch(a, 4, a, 5, a, 6));
+		t.add(K[i]);
+		t.add_load(w, i%16);
+
+		tmp.set(t);
+		tmp.add(Sigma0(a, 0));
+		tmp.add(Maj(a, 0, a, 1, a, 2));
+		tmp.store(b, 7);
+
+		t.add_load(b, 3);
+		t.store(b, 3);
+
+		for (j = 0; j < 8; j++) {
+		    tmp.load(a, (j+1)%8);
+		    tmp.store(b, j);
+		}
+		if (i%16 == 15) {
+		    for (j = 0; j < 16; j++) {
+			tmp.load(w, (j+9)%16);
+			tmp.add(sigma0(w, (j+1)%16));
+			tmp.add(sigma1(w, (j+14)%16));
+			tmp.add_load(w, j);
+			tmp.store(w, j);
+		    }
+		}
+	    }
+
+	    for (i = 0; i < 8; i++) {
+		tmp.load(z, i);
+		tmp.add_load(a, i);
+		tmp.store(a, i);
+		tmp.store(z, i);
+	    }
+
+	    offset += 128;
+	    n -= 128;
+	}
+
+	for (i = 0; i < 8; i++) {
+	    tmp.load(z, i);
+	    ts64(x,8*i,tmp);
+	}
+
+	return n;
+    }
+
+    var iv = new Uint8Array([
+	0x6a,0x09,0xe6,0x67,0xf3,0xbc,0xc9,0x08,
+	0xbb,0x67,0xae,0x85,0x84,0xca,0xa7,0x3b,
+	0x3c,0x6e,0xf3,0x72,0xfe,0x94,0xf8,0x2b,
+	0xa5,0x4f,0xf5,0x3a,0x5f,0x1d,0x36,0xf1,
+	0x51,0x0e,0x52,0x7f,0xad,0xe6,0x82,0xd1,
+	0x9b,0x05,0x68,0x8c,0x2b,0x3e,0x6c,0x1f,
+	0x1f,0x83,0xd9,0xab,0xfb,0x41,0xbd,0x6b,
+	0x5b,0xe0,0xcd,0x19,0x13,0x7e,0x21,0x79
+    ]);
+
+    function crypto_hash(out, m, n) {
+	var h = new Uint8Array(iv);
+	var x = new Uint8Array(256);
+	var i;
+	var b = n;
+	var offset = 0;
+
+	if (n > 0xffffffff) {
+	    throw {message: "crypto_hash: cannot hash blocks larger than 2^32-1"};
+	}
+
+	crypto_hashblocks(h,m,n);
+	offset += n;
+	n &= 127;
+	offset -= n;
+
+	for (i = 0; i < n; i++) x[i] = m[i + offset];
+	x[n] = 128;
+
+	n = 256-128*(n<112);
+	x[n-5] = (b >>> 29) & 0xff;
+	x[n-4] = (b >>> 21) & 0xff;
+	x[n-3] = (b >>> 13) & 0xff;
+	x[n-2] = (b >>>  5) & 0xff;
+	x[n-1] = (b << 3) & 0xff;
+	crypto_hashblocks(h,x,n);
+
+	out.set(h);
+	return 0;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+
+/*
 static void add(gf p[4],gf q[4])
 {
   gf a,b,c,d,t,e,f,g,h;
@@ -1210,6 +1373,8 @@ int crypto_sign_open(u8 *m,u64 *mlen,const u8 *sm,u64 n,const u8 *pk)
 	crypto_box_open_afternm: crypto_box_open_afternm,
 	crypto_box: crypto_box,
 	crypto_box_open: crypto_box_open,
+	crypto_hashblocks: crypto_hashblocks,
+	crypto_hash: crypto_hash,
 
 	constants: {
 	    crypto_auth_PRIMITIVE: "hmacsha512256",
@@ -1511,6 +1676,19 @@ function TweetNacl() {
 
 	///////////////////////////////////////////////////////////////////////////
 
+	crypto_hash: function (bs) {
+	    var address = coerce_u8(bs);
+	    var hash = new Uint8Array(C.crypto_hash_BYTES);
+	    check("crypto_hash", nacl_raw.crypto_hash(hash, address, bs.byteLength));
+	    return hash;
+	},
+
+	crypto_hash_string: function (s) {
+	    return exports.crypto_hash(nacl_raw.encode_utf8(s));
+	},
+
+	///////////////////////////////////////////////////////////////////////////
+
 /*
     function crypto_sign_keypair_from_seed(bs) {
 	var seeda = check_injectBytes("crypto_sign_keypair_from_seed",
@@ -1581,6 +1759,8 @@ function testit() {
 	   "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742");
 
     var helloHash = t.from_hex("9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043");
+    expect("hash", t.to_hex(t.crypto_hash_string("hello")), t.to_hex(helloHash));
+
     var sk = helloHash.subarray(0, t.constants.crypto_box_SECRETKEYBYTES);
     var kp = t.crypto_box_keypair_from_raw_sk(sk);
     expect("sk", t.to_hex(kp.boxSk),
