@@ -17,6 +17,7 @@ function TweetNaclC() {
     var randombytes_fill;
     if (typeof module !== 'undefined' && module.exports) {
 	// node.js
+	var crypto = require('crypto');
 	randombytes_fill = function (buf) {
 	    buf.set(crypto.randomBytes(buf.byteLength));
 	};
