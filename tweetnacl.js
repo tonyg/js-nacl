@@ -636,8 +636,6 @@ function TweetNaclC() {
 	var tlo, thi, i, clo, chi;
 	clo = (~(b-1)) >>> 0;
 	chi = (clo >>> 31) ? 0xffffffff : 0;
-	// dumpbuf("sel25519 p", p);
-	// dumpbuf("sel25519 q", q);
 	for (i = 0; i < 32; i += 2) {
 	    tlo = clo & (p[i+0] ^ q[i+0]);
 	    thi = chi & (p[i+1] ^ q[i+1]);
@@ -744,10 +742,8 @@ function TweetNaclC() {
 	for (i = 0; i < 32 /* ! not 16 */; i++) {
 	    o[i]=t[i];
 	}
-	// dumpbuf("o0", o);
 	car25519(o);
 	car25519(o);
-	// dumpbuf("o1", o);
     }
 
     function S(o,a) {
@@ -791,47 +787,33 @@ function TweetNaclC() {
 	z[31]=(n[31]&127)|64;
 	z[0]&=248;
 	unpack25519(x,p);
-	// dumpbuf("x00", x);
 	var b = copy_gf(x);
-	// dumpbuf("x", x);
-	// dumpbuf("b", b);
 	setlo32(a, 0, 1);
 	setlo32(d, 0, 1);
 	for(i=254;i>=0;--i) {
-	    // if (i == 254) dumpbuf("a0", a);
 	    r=(z[i>>3]>>(i&7))&1;
 	    sel25519(a,b,r);
-	    // if (i == 254) dumpbuf("a1", a);
 	    sel25519(c,d,r);
 	    A(e,a,c);
 	    Z(a,a,c);
-	    // if (i == 254) dumpbuf("a2", a);
 	    A(c,b,d);
 	    Z(b,b,d);
 	    S(d,e);
 	    S(f,a);
-	    // if (i == 254) dumpbuf("a2.5", a);
 	    M(a,c,a);
-	    // if (i == 254) dumpbuf("a3", a);
 	    M(c,b,e);
 	    A(e,a,c);
 	    Z(a,a,c);
-	    // if (i == 254) dumpbuf("a4", a);
 	    S(b,a);
 	    Z(c,d,f);
 	    M(a,c,_121665);
-	    // if (i == 254) dumpbuf("a5", a);
 	    A(a,a,d);
-	    // if (i == 254) dumpbuf("a6", a);
 	    M(c,c,a);
 	    M(a,d,f);
-	    // if (i == 254) dumpbuf("a7", a);
 	    M(d,b,x);
 	    S(b,e);
 	    sel25519(a,b,r);
-	    // if (i == 254) dumpbuf("a8", a);
 	    sel25519(c,d,r);
-	    // if (i == 254) dumpbuf("a9", a);
 	}
 	x.set(a, 32);
 	x.set(c, 64);
