@@ -1206,7 +1206,7 @@ function TweetNaclC() {
 	p[2].set(gf1);
 	p[3].set(gf0);
 	for (var i = 255;i >= 0;--i) {
-	    var b = (s[i/8]>>(i&7))&1;
+	    var b = (s[i>>>3]>>>(i&7))&1;
 	    cswap(p,q,b);
 	    add(q,p);
 	    add(p,p);
