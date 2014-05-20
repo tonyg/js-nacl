@@ -1883,46 +1883,13 @@ function TweetNacl() {
     return exports;
 }
 
-function testit() {
-    var t = TweetNacl();
-
-    var C = t.from_hex('08877931f3041765b847df995236a3c6b799cabe24');
-    var N = t.from_hex('000000000000000000000000000000000000000000000000');
-    var K = t.from_hex('2bc13f55fb873ba3c5bde13c31db69c69c8067cfc80c92d918d0884981bf72dd');
-
-    var m = t.encode_utf8('hello');
-
-    function expect(what, actual, expected) {
-	if (actual !== expected) {
-	    console.log("Expected " + what + " to be " + expected + " but got " + actual);
-	}
+var nacl_factory = {
+    instantiate: function (requested_total_memory) {
+	return TweetNacl();
     }
+};
 
-    var c2 = t.crypto_secretbox(m, N, K);
-    expect("c2 ciphertext", t.to_hex(c2), t.to_hex(C));
-
-    var m2 = t.crypto_secretbox_open(c2, N, K);
-    console.log(t.decode_utf8(m2));
-    expect("m2 plaintext", t.to_hex(m2), t.to_hex(m));
-
-    // Check correctness of curve25519 via NaCl test vector
-    var alice_private =
-	t.from_hex("77076d0a7318a57d3c16c17251b26645df4c2f87ebc0992ab177fba51db92c2a");
-    var bob_public =
-	t.from_hex("de9edb7d7b7dc1b4d35b61c2ece435373f8343c85b78674dadfc7e146f882b4f");
-    expect("scalarmult alice bob",
-	   t.to_hex(t.crypto_scalarmult(alice_private, bob_public)),
-	   "4a5d9d5ba4ce2de1728e3bf480350f25e07e21c947d19e3376f09b3c1e161742");
-
-    var helloHash = t.from_hex("9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043");
-    expect("hash", t.to_hex(t.crypto_hash_string("hello")), t.to_hex(helloHash));
-
-    var sk = helloHash.subarray(0, t.constants.crypto_box_SECRETKEYBYTES);
-    var kp = t.crypto_box_keypair_from_raw_sk(sk);
-    expect("sk", t.to_hex(kp.boxSk),
-    	   "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca7");
-    expect("pk", t.to_hex(kp.boxPk),
-    	   "d8333ecf53dac465d59f3b03878ceff88947eec57c965105a049a0f5f1b7a510");
+// export common.js module to allow one js file for browser and node.js
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = nacl_factory;
 }
-
-testit();
