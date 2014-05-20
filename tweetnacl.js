@@ -1229,7 +1229,7 @@ function TweetNaclC() {
 	var p = new_gf4();
 	var i;
 
-	randombytes(sk, 32);
+	randombytes_fill(sk.subarray(32));
 	crypto_hash(d, sk, 32);
 	d[0] &= 248;
 	d[31] &= 127;
@@ -1460,6 +1460,8 @@ function TweetNaclC() {
 	decode_latin1: decode_latin1,
 	to_hex: to_hex,
 	from_hex: from_hex,
+	randombytes_fill: randombytes_fill,
+	Word: Word,
 
 	crypto_verify_16: crypto_verify_16,
 	crypto_verify_32: crypto_verify_32,
@@ -1808,7 +1810,7 @@ function TweetNacl() {
 	    var ma = coerce_u8(msg);
 	    var ska = check_length("crypto_sign", "sk", sk, C.crypto_sign_SECRETKEYBYTES);
 	    var sm = new Uint8Array(msg.byteLength + C.crypto_sign_BYTES);
-	    var smlen = new Word();
+	    var smlen = new nacl_raw.Word();
 	    check("crypto_sign", nacl_raw.crypto_sign(sm, smlen, ma, msg.byteLength, ska));
 	    if (smlen.hi !== 0) {
 		throw {message: "crypto_sign: signed message longer than 2^32-1 bytes"};
@@ -1826,7 +1828,7 @@ function TweetNacl() {
 	    var sma = coerce_u8(sm);
 	    var pka = check_length("crypto_sign_open", "pk", pk, C.crypto_sign_PUBLICKEYBYTES);
 	    var m = new Uint8Array(sm.byteLength);
-	    var mlen = new Word();
+	    var mlen = new nacl_raw.Word();
 	    if (nacl_raw.crypto_sign_open(m, mlen, sma, sm.byteLength, pka) === 0) {
 		if (mlen.hi !== 0) {
 		    throw {message: "crypto_sign_open: message longer than 2^32-1 bytes"};
