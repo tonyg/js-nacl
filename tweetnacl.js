@@ -243,9 +243,18 @@ function TweetNaclC() {
     };
 
     Word.prototype.rori = function (imm) {
+	var newlo, newhi;
 	if (!imm) return;
-	var newlo = ((this.hi << (32 - imm)) | (this.lo >>> imm)) >>> 0;
-	var newhi = ((this.lo << (32 - imm)) | (this.hi >>> imm)) >>> 0;
+	if (imm < 32) {
+	    newlo = ((this.hi << (32 - imm)) | (this.lo >>> imm)) >>> 0;
+	    newhi = ((this.lo << (32 - imm)) | (this.hi >>> imm)) >>> 0;
+	} else if (imm == 32) {
+	    newlo = this.hi;
+	    newhi = this.lo;
+	} else {
+	    newlo = ((this.lo << (64 - imm)) | (this.hi >>> (imm - 32))) >>> 0;
+	    newhi = ((this.hi << (64 - imm)) | (this.lo >>> (imm - 32))) >>> 0;
+	}
 	this.lo = newlo;
 	this.hi = newhi;
     };

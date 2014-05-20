@@ -60,6 +60,9 @@
 		    3
 		    6
 		    10
+		    20
+		    32
+		    40
 		    1000000000
 		    (expt 2 31)
 		    (- (expt 2 32) 1)
@@ -95,6 +98,7 @@
 
 (define (only-nonnegative x) (and (not (negative? x)) x))
 (define (only-shiftable x) (and (not (negative? x)) (modulo x 32)))
+(define (only-rotatable x) (and (not (negative? x)) (modulo x 64)))
 
 (define cases `(
 		(add ,i64+ 2 #f)
@@ -110,7 +114,7 @@
 		(shli ,i64<< 1 ,only-shiftable)
 		(sari ,i64>> 1 ,only-shiftable)
 		(shri ,i64>>> 1 ,only-shiftable)
-		(rori ,i64ror 1 ,only-shiftable)
+		(rori ,i64ror 1 ,only-rotatable)
 		(not ,i64~ 1 #f)
 		))
 
