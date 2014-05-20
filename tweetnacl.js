@@ -358,10 +358,10 @@ function TweetNaclC() {
       h is 1 in order to ???, 0 in order to ???
     */
     function core(out, inbuf, k, c, h) {
-	var cView = new Uint32Array(c.buffer);
-	var kView = new Uint32Array(k.buffer);
-	var inbufView = new Uint32Array(inbuf.buffer);
-	var outView = new Uint32Array(out.buffer);
+	var cView = new Uint32Array(c.buffer, c.byteOffset, c.byteLength >> 2);
+	var kView = new Uint32Array(k.buffer, k.byteOffset, k.byteLength >> 2);
+	var inbufView = new Uint32Array(inbuf.buffer, inbuf.byteOffset, inbuf.byteLength >> 2);
+	var outView = new Uint32Array(out.buffer, out.byteOffset, out.byteLength >> 2);
 
 	var w = new Uint32Array(16);
 	var x = new Uint32Array(16);
@@ -712,7 +712,7 @@ function TweetNaclC() {
     }
 
     function unpack25519(o,n) {
-	var nView = new Uint16Array(n.buffer);
+	var nView = new Uint16Array(n.buffer, n.byteOffset, n.byteLength >> 1);
 	for (var i = 0; i < 16; i++) {
 	    setlo32(o, i, nView[i]);
 	    sethi32(o, i, 0);
@@ -787,7 +787,7 @@ function TweetNaclC() {
     }
 
     // function dumpbuf(what, buf) {
-    // 	console.log(what + "(" + buf.byteLength + "):", to_hex(new Uint8Array(buf.buffer)));
+    // 	console.log(what + "(" + buf.byteLength + "):", to_hex(new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength)));
     // }
 
     function crypto_scalarmult(q,n,p) {
@@ -1574,7 +1574,7 @@ function TweetNacl() {
 	    thing = new Uint8Array(thing);
 	}
 	if (!(thing instanceof Uint8Array)) {
-	    thing = new Uint8Array(thing.buffer);
+	    thing = new Uint8Array(thing.buffer, thing.byteOffset, thing.byteLength);
 	}
 	return thing;
     }
@@ -1586,7 +1586,7 @@ function TweetNacl() {
 	    result.set(thing, prefixlen);
 	} else {
 	    if (!(thing instanceof Uint8Array)) {
-		thing = new Uint8Array(thing.buffer);
+		thing = new Uint8Array(thing.buffer, thing.byteOffset, thing.byteLength);
 	    }
 	    result = new Uint8Array(thing.byteLength + prefixlen);
 	    result.set(thing, prefixlen);
