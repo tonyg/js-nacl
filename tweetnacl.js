@@ -24,7 +24,7 @@ function TweetNaclC() {
     } else if (window && window.crypto && window.crypto.getRandomValues) {
 	// modernish browser
 	randombytes_fill = function (buf) {
-	    crypto.getRandomValues(buf);
+	    window.crypto.getRandomValues(buf);
 	};
     } else {
 	randombytes_fill = function (buf) {
@@ -1599,7 +1599,7 @@ function TweetNacl() {
 	if (thing.byteLength !== expected_length) {
 	    throw { name: "Invalid " + what + " length",
 		    message: function_name + " expected binary " + what + " input of length "
-		             + expected + " but got length " + thing.byteLength,
+		             + expected_length + " but got length " + thing.byteLength,
 		    expected: expected_length,
 		    actual: thing.byteLength };
 	}
@@ -1820,7 +1820,7 @@ function TweetNacl() {
 
 	crypto_sign_detached: function (msg, sk) {
 	    // WARNING: Experimental. Works for ed25519 but not necessarily other implementations.
-	    var signed_msg = crypto_sign(msg, sk);
+	    var signed_msg = exports.crypto_sign(msg, sk);
 	    return signed_msg.subarray(0, C.crypto_sign_BYTES);
 	},
 
@@ -1846,7 +1846,7 @@ function TweetNacl() {
 	    var signed_msg = new Uint8Array(det.byteLength + m.byteLength);
 	    signed_msg.set(det, 0);
 	    signed_msg.set(m, det.byteLength);
-	    return crypto_sign_open(signed_msg, pk) !== null;
+	    return exports.crypto_sign_open(signed_msg, pk) !== null;
 	},
 
 	///////////////////////////////////////////////////////////////////////////
