@@ -1074,8 +1074,8 @@ function TweetNaclC() {
 		t.store(b, 3);
 
 		for (j = 0; j < 8; j++) {
-		    tmp.load(a, (j+1)%8);
-		    tmp.store(b, j);
+		    tmp.load(b, j);
+		    tmp.store(a, (j+1)%8);
 		}
 		if (i%16 == 15) {
 		    for (j = 0; j < 16; j++) {
