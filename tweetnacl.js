@@ -787,7 +787,7 @@ function TweetNaclC() {
     }
 
     // function dumpbuf(what, buf) {
-    // 	console.log(what + ":", "(" + buf.byteLength + ")", to_hex(new Uint8Array(buf.buffer)));
+    // 	console.log(what + "(" + buf.byteLength + "):", to_hex(new Uint8Array(buf.buffer)));
     // }
 
     function crypto_scalarmult(q,n,p) {
