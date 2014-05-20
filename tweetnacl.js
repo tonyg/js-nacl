@@ -1878,10 +1878,14 @@ function TweetNacl() {
 	decode_utf8: nacl_raw.decode_utf8,
 	decode_latin1: nacl_raw.decode_latin1,
 	to_hex: nacl_raw.to_hex,
-	from_hex: nacl_raw.from_hex,
-
-	constants: nacl_raw.constants
+	from_hex: nacl_raw.from_hex
     };
+
+    for (var k in C) {
+	if (Object.prototype.hasOwnProperty.call(C, k)) {
+	    exports[k] = C[k];
+	}
+    }
 
     return exports;
 }
