@@ -32,8 +32,8 @@ suite.hashing = function () {
     assert.equal(nacl.to_hex(nacl.crypto_hash(nacl.encode_utf8("hello"))),
 		 "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca7"+
 		 "2323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043");
-    assert.equal(nacl.to_hex(nacl.crypto_hash_sha256(nacl.encode_utf8("hello"))),
-		 "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
+    // assert.equal(nacl.to_hex(nacl.crypto_hash_sha256(nacl.encode_utf8("hello"))),
+    // 		 "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824");
 };
 
 suite.boxKeypairFromSeed = function () {
@@ -114,19 +114,19 @@ suite.onetimeAuth = function () {
 		 false);
 };
 
-suite.auth = function () {
-    var authkey =
-	nacl.crypto_hash(nacl.encode_utf8("hello")).subarray(0, nacl.crypto_auth_KEYBYTES);
-    var auth = nacl.crypto_auth(nacl.encode_utf8("hello"), authkey);
-    assert.equal(nacl.to_hex(auth),
-		 "3363a029b88688109b420ea8bed190228893c3fc85c18bf0dc4a1d14b4ce57fd");
-    assert.ok(nacl.crypto_auth_verify(auth, nacl.encode_utf8("hello"), authkey));
-    assert.equal(nacl.crypto_auth_verify(auth, nacl.encode_utf8("hellp"), authkey), false);
-    assert.equal(nacl.crypto_auth_verify(auth.subarray(1), nacl.encode_utf8("hello"), authkey),
-		 false);
-    auth[0] = auth[0] + 1;
-    assert.equal(nacl.crypto_auth_verify(auth, nacl.encode_utf8("hello"), authkey), false);
-};
+// suite.auth = function () {
+//     var authkey =
+// 	nacl.crypto_hash(nacl.encode_utf8("hello")).subarray(0, nacl.crypto_auth_KEYBYTES);
+//     var auth = nacl.crypto_auth(nacl.encode_utf8("hello"), authkey);
+//     assert.equal(nacl.to_hex(auth),
+// 		 "3363a029b88688109b420ea8bed190228893c3fc85c18bf0dc4a1d14b4ce57fd");
+//     assert.ok(nacl.crypto_auth_verify(auth, nacl.encode_utf8("hello"), authkey));
+//     assert.equal(nacl.crypto_auth_verify(auth, nacl.encode_utf8("hellp"), authkey), false);
+//     assert.equal(nacl.crypto_auth_verify(auth.subarray(1), nacl.encode_utf8("hello"), authkey),
+// 		 false);
+//     auth[0] = auth[0] + 1;
+//     assert.equal(nacl.crypto_auth_verify(auth, nacl.encode_utf8("hello"), authkey), false);
+// };
 
 suite.secretBox = function () {
     var n = wouldBeRandomInARealProgram(nacl.crypto_secretbox_NONCEBYTES);
