@@ -96,6 +96,25 @@ function TweetNaclC() {
 	this.hi = hi >>> 0;
     }
 
+    Word.prototype.hex = function () {
+	return (("0123456789abcdef"[(this.hi >>> 28) & 15]) +
+		("0123456789abcdef"[(this.hi >>> 24) & 15]) +
+		("0123456789abcdef"[(this.hi >>> 20) & 15]) +
+		("0123456789abcdef"[(this.hi >>> 16) & 15]) +
+		("0123456789abcdef"[(this.hi >>> 12) & 15]) +
+		("0123456789abcdef"[(this.hi >>>  8) & 15]) +
+		("0123456789abcdef"[(this.hi >>>  4) & 15]) +
+		("0123456789abcdef"[(this.hi >>>  0) & 15]) +
+		("0123456789abcdef"[(this.lo >>> 28) & 15]) +
+		("0123456789abcdef"[(this.lo >>> 24) & 15]) +
+		("0123456789abcdef"[(this.lo >>> 20) & 15]) +
+		("0123456789abcdef"[(this.lo >>> 16) & 15]) +
+		("0123456789abcdef"[(this.lo >>> 12) & 15]) +
+		("0123456789abcdef"[(this.lo >>>  8) & 15]) +
+		("0123456789abcdef"[(this.lo >>>  4) & 15]) +
+		("0123456789abcdef"[(this.lo >>>  0) & 15]));
+    };
+
     Word.prototype.extendHi = function (lo, hi) {
 	if (typeof hi !== 'undefined') return hi;
 	return (lo < 0) ? -1 : 0;
