@@ -1,6 +1,6 @@
 if (typeof module !== 'undefined' && module.exports) {
     // We are running in node
-    var nacl = require("../lib/nacl_factory.js").instantiate();
+    var nacl = require("../tweetnacl.js").instantiate();
     var assert = require("assert");
     var suite = module.exports;
 } else {

@@ -122,7 +122,7 @@ if (typeof window !== 'undefined') {
     };
     window.onload = main;
 } else {
-    nacl_factory = require("./lib/nacl_factory.js");
+    nacl_factory = require("./tweetnacl.js");
     output = function (x) {
 	console.log(x);
     };
