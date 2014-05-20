@@ -1263,7 +1263,7 @@ function TweetNaclC() {
 	    for (j = i - 32;j < i - 12;++j) {
 		tmp.seti(16);
 		tmp.mul_load(x, i);
-		tmp.mul_load(L, j - (i - 32));
+		tmp.mul(L[j - (i - 32)]);
 		tmp.neg();
 		tmp.add(carry);
 		tmp.add_load(x, j);
@@ -1288,7 +1288,7 @@ function TweetNaclC() {
 	for (j = 0; j < 32; j++) {
 	    tmp.load(x, 31);
 	    tmp.sari(4);
-	    tmp.mul_load(L, j);
+	    tmp.mul(L[j]);
 	    tmp.neg();
 	    tmp.add(carry);
 	    tmp.add_load(x, j);
@@ -1301,14 +1301,14 @@ function TweetNaclC() {
 	}
 	for (j = 0; j < 32; j++) {
 	    tmp.set(carry);
-	    tmp.mul_load(L, j);
+	    tmp.mul(L[j]);
 	    tmp.neg();
 	    tmp.add_load(x, j);
 	    tmp.store(x, j);
 	}
 	for (i = 0; i < 32; i++) {
 	    tmp.load(x, i);
-	    tmp.sari(x, 8);
+	    tmp.sari(8);
 	    tmp.add_load(x, i+1);
 	    tmp.store(x, i+1);
 	    r[i] = getlo32(x, i) & 255;
