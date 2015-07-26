@@ -5,7 +5,7 @@
   "authors": [
     "Tony Garnock-Jones"
   ],
-  "description": "Emscripten-compiled Javascript      version of NaCl, the Networking and Cryptography        library.",
+  "description": "Emscripten-compiled Javascript version of NaCl, the Networking and Cryptography library.",
   "main": "lib/nacl_factory.js",
   "moduleType": [
     "node"
@@ -19,7 +19,7 @@
   ],
   "ignore": [
     "**/.*",
-    "node_modules"
+    "node_modules",
     "bower_components",
     "test",
     "tests"
