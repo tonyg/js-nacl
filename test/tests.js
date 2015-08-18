@@ -65,13 +65,6 @@ suite.precomputedBox = function () {
     assert.equal(nacl.decode_utf8(m), plaintext);
 };
 
-suite.boxKeypairFromSeed = function () {
-    var seed = nacl.encode_utf8("hello");
-    var kp = nacl.crypto_box_keypair_from_seed(seed);
-    assert.equal(nacl.to_hex(kp.boxSk), "9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca7");
-    assert.equal(nacl.to_hex(kp.boxPk), "d8333ecf53dac465d59f3b03878ceff88947eec57c965105a049a0f5f1b7a510");
-};
-
 suite.normalBox = function () {
     var seed = nacl.encode_utf8("hello");
     var kp = nacl.crypto_box_keypair_from_seed(seed);
