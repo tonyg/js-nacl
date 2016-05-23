@@ -6,11 +6,7 @@ policy is to include the generated javascript as a checked-in file.
 ## Ingredients
 
  - Python 2.x
- - a recent Emscripten, which in turn has dependencies on:
-    - LLVM 3.2
-    - Clang 3.2
-    - Node.js 0.6.12 or newer
-    - Python 2.7.3
+ - a recent Emscripten SDK
  - Node.js and npm to run the [mocha](http://visionmedia.github.io/mocha/)-based tests
 
 Within the `js-nacl` directory,

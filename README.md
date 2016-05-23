@@ -23,6 +23,11 @@ all the versions I've tried.
 
 ## Changes
 
+Version 1.1.0: **API change.** The `nacl_factory.instantiate` function
+now expects a callback as its first argument. It calls the callback
+with the `nacl` instance containing the API functions, and returns no
+useful value.
+
 Version 0.5.0: **API change.** Instead of being provided with a module
 `nacl`, with API functions available directly, library importers are
 given `nacl_factory` with a single function `instantiate`, which
@@ -55,33 +60,44 @@ In the browser, include the `lib/nacl_factory.js` script:
     <script src="lib/nacl_factory.js"></script>
     ...
     <script>
-      var nacl = nacl_factory.instantiate();
-      alert(nacl.to_hex(nacl.random_bytes(16)));
+      nacl_factory.instantiate(function (nacl) {
+        alert(nacl.to_hex(nacl.random_bytes(16)));
+      });
     </script>
 
 In node.js, require the `lib/nacl_factory.js` module:
 
     var nacl_factory = require("./lib/nacl_factory.js");
-    var nacl = nacl_factory.instantiate();
-    ...
-    console.log(nacl.to_hex(nacl.random_bytes(16)));
+    nacl_factory.instantiate(function (nacl) {
+      ...
+      console.log(nacl.to_hex(nacl.random_bytes(16)));
+    });
 
 Or if you have installed the library via `npm`,
 
     var nacl_factory = require("js-nacl");
-    var nacl = nacl_factory.instantiate();
-    ...
-    console.log(nacl.to_hex(nacl.random_bytes(16)));
+    nacl_factory.instantiate(function (nacl) {
+      ...
+      console.log(nacl.to_hex(nacl.random_bytes(16)));
+    });
 
 ## Instantiating the NaCl module
 
-Calling `nacl_factory.instantiate()` creates an entirely fresh module
-instance, complete with its own private heap area. By default, this
-heap is 32 megabytes in size, 33,554,432 bytes. The size of the module
-instance's private heap can be altered by supplying an argument to
-`instantiate`, e.g.:
+Pass `nacl_factory.instantiate` a callback function expecting a single
+argument, the `nacl` module instance.
 
-    var nacl = nacl_factory.instantiate(16777216);
+The `nacl_factory.instantiate` function expects also a second optional
+argument, a dictionary of optional configuration values.
+
+Each call to `nacl_factory.instantiate()` creates an entirely fresh
+module instance, complete with its own private heap area. By default,
+this heap is 32 megabytes in size, 33,554,432 bytes. The size of the
+module instance's private heap can be altered by supplying
+`requested_total_memory` to to `instantiate`, e.g.:
+
+    nacl_factory.instantiate(on_ready, {
+      requested_total_memory: 16777216
+    });
 
 The argument must be a power of two, if supplied.
 

@@ -12,7 +12,6 @@
     <script>mocha.setup('exports');</script>
     <script src="../lib/nacl_factory.js"></script>
     <script>
-      var nacl = nacl_factory.instantiate();
       var assert = (function () {
         var exports = {};
         exports.fail = function (actual, expected, message, operator) {
@@ -30,12 +29,18 @@
         exports.ok = function (v, m) { exports.equal(v, true, m); };
         return exports;
       })();
+      var nacl;
       var suite = {};
     </script>
     <script src="tests.js"></script>
     <script>
-      mocha.suite.emit('require', suite);
-      mocha.run();
+      nacl_factory.instantiate(function (nacl_instance) {
+        nacl = nacl_instance;
+        mocha.suite.emit('require', suite);
+        mocha.run();
+      }, {
+        memoryInitializerPrefixURL: '../lib/'
+      });
     </script>
   </body>
 </html>

@@ -1,5 +1,7 @@
 /* Derivation of Ed25519 keypairs from seeds. Compatible with libsodium. */
 
+#include <stdlib.h>
+
 #include "crypto_hash_sha512.h"
 #include "subnacl/sign_ed25519/fe25519.h"
 #include "subnacl/sign_ed25519/ge25519.h"

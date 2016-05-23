@@ -13,9 +13,12 @@ function main () {
     output("Test,Iterations per second,Seconds per iteration");
 
     try {
-	do_tests(nacl_factory.instantiate());
+        nacl_factory.instantiate(do_tests, {
+          memoryInitializerPrefixURL: 'lib/'
+        });
     } catch (e) {
-    	output('EXCEPTION: ' + JSON.stringify(e));
+        console.error(e);
+        output('EXCEPTION: ' + e.message);
     }
 }
 
