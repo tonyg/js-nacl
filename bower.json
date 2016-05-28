@@ -1,11 +1,11 @@
 {
   "name": "js-nacl",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "homepage": "https://github.com/tonyg/js-nacl",
   "authors": [
     "Tony Garnock-Jones"
   ],
-  "description": "Emscripten-compiled Javascript version of NaCl, the Networking and Cryptography library.",
+  "description": "High-level API to libsodium.",
   "main": "lib/nacl_factory.js",
   "moduleType": [
     "node"

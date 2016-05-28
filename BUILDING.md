@@ -11,27 +11,13 @@ policy is to include the generated javascript as a checked-in file.
 
 Within the `js-nacl` directory,
 
- - [`import.py`](import.py) massages an unpacked `nacl` tarball,
-   extracting just the reference implementations of the various
-   algorithms. (See its
-   [origin](https://github.com/warner/pynacl/blob/minimal/import.py)
-   in Brian Warner's `minimal` branch of pynacl.)
-
- - [`keys.c`](keys.c) extends core `nacl` with a pynacl-compatible
-   implementation of `crypto_sign_keypair_from_raw_sk`, the foundation
-   for `nacl.crypto_sign_keypair_from_seed`.
-
  - [`nacl_cooked.js`](nacl_cooked.js) is the high-level Javascript
    interface to the low-level code.
 
  - [`nacl_cooked_prefix.js`](nacl_cooked_prefix.js) and
    [`nacl_cooked_suffix.js`](nacl_cooked_suffix.js) are wrapped
-   around `nacl_cooked.js` and `nacl_raw.js` to create
+   around `nacl_cooked.js` and `libsodium.js` to create
    `lib/nacl_factory.js`.
-
- - [`nacl_randombytes_emscripten.js`](nacl_randombytes_emscripten.js) is
-   infrastructure for making the Emscripten-compiled library
-   parameterized in its source of randomness.
 
  - [`test/runner.html`](test/runner.html) runs the Mocha tests in the browser.
 
@@ -62,10 +48,10 @@ Other Makefile targets:
    runs the test suite using node.js.
 
  - `make clean`: removes generated Javascript, but does not remove the
-   unpacked and pre-processed `nacl` tarball contents.
+   unpacked and pre-processed `libsodium` tarball contents.
 
- - `make veryclean`: as `make clean`, but also removes the `subnacl`
-   directory and the contents of the `nacl` tarball.
+ - `make veryclean`: as `make clean`, but also removes the contents of
+   the `libsodium` tarball.
 
  - `make all`: performs all the build steps.
 
@@ -79,10 +65,5 @@ your `$PATH`.
 
 ## Serves three
 
-The build products will be in
-
- - [`node_raw.js`](node_raw.js): output from Emscripten
-
- - `lib/*`: Javascript for use in the browser and in node.js
-
- - `subnacl/*`: Unpacked `nacl` tarball, after processing by `import.py`
+The build products, Javascript for use in the browser and in node.js,
+will be in `lib/*`.

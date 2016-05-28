@@ -1,9 +1,7 @@
-NACLRAW=nacl_raw.js
-NACLVERSION=20110221+Ed25519-20130419
-NACLUNPACKED=nacl-$(NACLVERSION)
+LIBSODIUMVERSION=1.0.10
+LIBSODIUMUNPACKED=libsodium-$(LIBSODIUMVERSION)
 
-PYTHON=python
-EMCC=`which emcc`
+LIBSODIUM_JS=$(LIBSODIUMUNPACKED)/libsodium-js/lib/libsodium.js
 
 test: all
 	npm test
@@ -11,32 +9,20 @@ test: all
 ## Builds well with emscripten SDK 1.36.4.
 all: lib
 
-$(NACLRAW): subnacl
-	EMCC_DEBUG=2 $(PYTHON) $(EMCC) \
-		-s ASSERTIONS=2 \
-		-s LINKABLE=1 \
-		-s EXPORTED_FUNCTIONS="$$(cat subnacl/naclexports.sh)" \
-		--js-library nacl_randombytes_emscripten.js \
-		--post-js subnacl/naclapi.js \
-		-O3 -o $@ \
-		-I subnacl/include \
-		keys.c \
-		$$(find subnacl -name '*.c')
-
 clean:
-	rm -f $(NACLRAW)
 	rm -rf lib
 
-lib: $(NACLRAW) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
+$(LIBSODIUM_JS): $(LIBSODIUMUNPACKED)
+	(cd libsodium-1.0.10; ./dist-build/emscripten.sh --sumo)
+
+lib: $(LIBSODIUM_JS) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
 	mkdir -p $@
-	cat nacl_cooked_prefix.js $(NACLRAW) nacl_cooked.js nacl_cooked_suffix.js \
+	cat nacl_cooked_prefix.js $(LIBSODIUM_JS) nacl_cooked.js nacl_cooked_suffix.js \
 		> $@/nacl_factory.js
-	cp nacl_raw.js.mem $@/
 
 veryclean: clean
 	rm -rf subnacl
-	rm -rf $(NACLUNPACKED)
+	rm -rf $(LIBSODIUMUNPACKED)
 
-subnacl: import.py
-	tar -jxvf $(NACLUNPACKED).tar.bz2
-	python import.py $(NACLUNPACKED)
+$(LIBSODIUMUNPACKED): libsodium-$(LIBSODIUMVERSION).tar.gz
+	tar -zxvf $<

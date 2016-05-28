@@ -1,8 +1,10 @@
-# js-nacl: Pure-Javascript Emscripten-compiled NaCl routines
+# js-nacl: Pure-Javascript High-level API to Emscripten-compiled libsodium routines
 
+A high-level Javascript API wrapping an
 [Emscripten](https://github.com/kripken/emscripten)-compiled
-[NaCl](http://nacl.cr.yp.to/), a cryptographic library. Includes both
-in-browser and node.js support.
+[libsodium](http://libsodium.org/), a cryptographic library based on
+[NaCl](http://nacl.cr.yp.to/). Includes both in-browser and node.js
+support.
 
 The paper "[The security impact of a new cryptographic
 library](http://cr.yp.to/highspeed/coolnacl-20120725.pdf)" is an
@@ -22,6 +24,13 @@ range of systems. The code has run fine on Chrome and Firefox across
 all the versions I've tried.
 
 ## Changes
+
+Version 1.2.0: js-nacl is now based around libsodium rather than the
+plain NaCl tarball. Functions `crypto_sign_keypair_from_seed` and
+`crypto_box_keypair_from_seed` have been renamed to their libsodium
+names, `crypto_sign_seed_keypair` and `crypto_box_seed_keypair`
+respectively; the old names are still available as aliases, though
+**deprecated**, to be removed in a future version.
 
 Version 1.1.0: **API change.** The `nacl_factory.instantiate` function
 now expects a callback as its first argument. It calls the callback
@@ -44,7 +53,7 @@ npmjs.org](https://npmjs.org/package/js-nacl). To install it:
 
 The git checkout includes a pre-compiled version of the library, so
 you won't need Emscripten unless you want to change something about
-the underlying NaCl library itself.
+the underlying C-language library itself.
 
 Essentially, the source checkout contains everything you will need to
 use the library in both the browser and in node.js.
@@ -354,7 +363,7 @@ It is not generally safe to supply (for example) a user's passphrase
 directly to these procedures without using PBKDF2, scrypt or something
 similar beforehand.
 
-### nacl.crypto\_sign\_keypair\_from\_seed(Uint8Array) → {"signPk": Uint8Array, "signSk": Uint8Array}
+### nacl.crypto\_sign\_seed\_keypair(Uint8Array) → {"signPk": Uint8Array, "signSk": Uint8Array}
 
 Produces a *signing* keypair from its argument. A given binary input
 will always produce the same keypair as output.
@@ -372,7 +381,9 @@ Compatible with [PyNaCl](https://github.com/warner/pynacl)'s
 `crypto_sign_keypair_fromseed` and
 [racl](https://github.com/tonyg/racl)'s `bytes->crypto-sign-keypair`.
 
-### nacl.crypto\_box\_keypair\_from\_seed(Uint8Array) → {"boxPk": Uint8Array, "boxSk": Uint8Array}
+(Prior to v1.2.0, known as `nacl.crypto_sign_keypair_from_seed`.)
+
+### nacl.crypto\_box\_seed\_keypair(Uint8Array) → {"boxPk": Uint8Array, "boxSk": Uint8Array}
 
 Produces an *encrypted authenticated box* keypair from its argument. A
 given binary input will always produce the same keypair as output.
@@ -386,6 +397,8 @@ PBKDF2 and scrypt at the beginning of this section.
 
 Compatible with [racl](https://github.com/tonyg/racl)'s
 `bytes->crypto-box-keypair`.
+
+(Prior to v1.2.0, known as `nacl.crypto_box_keypair_from_seed`.)
 
 ### nacl.crypto\_box\_keypair\_from\_raw\_sk(Uint8Array) → {"boxPk": Uint8Array, "boxSk": Uint8Array}
 
@@ -426,7 +439,7 @@ js-nacl is written by Tony Garnock-Jones <tonygarnockjones@gmail.com>
 and is licensed under the [MIT
 license](http://opensource.org/licenses/MIT):
 
-> Copyright &copy; 2013 Tony Garnock-Jones.
+> Copyright &copy; 2013-2016 Tony Garnock-Jones.
 >
 > Permission is hereby granted, free of charge, to any person
 > obtaining a copy of this software and associated documentation files
@@ -448,11 +461,23 @@ license](http://opensource.org/licenses/MIT):
 > CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
 
-js-nacl relies on NaCl itself, which is public domain code by Daniel
-J. Bernstein and others.
+js-nacl relies on libsodium, which is released under the
+[ISC license](https://en.wikipedia.org/wiki/ISC_license):
 
-js-nacl's build process relies on (a modified version of) the
-`import.py` script by Brian Warner, which comes from
-[PyNaCl](https://github.com/warner/pynacl) and is licensed under
-[version 2.0 of the Apache
-license](http://www.apache.org/licenses/LICENSE-2.0.html).
+> Copyright (c) 2013-2016
+> Frank Denis <j at pureftpd dot org>
+>
+> Permission to use, copy, modify, and/or distribute this software for any
+> purpose with or without fee is hereby granted, provided that the above
+> copyright notice and this permission notice appear in all copies.
+>
+> THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+> WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+> MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+> ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+> WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+> ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+> OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+libsodium in turn relies on NaCl itself, which is public domain code
+by Daniel J. Bernstein and others.

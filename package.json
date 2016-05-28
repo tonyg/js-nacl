@@ -1,7 +1,7 @@
 {
     "name": "js-nacl",
-    "version": "1.1.0",
-    "description": "Emscripten-compiled Javascript version of NaCl, the Networking and Cryptography library.",
+    "version": "1.2.0",
+    "description": "High-level API to libsodium.",
     "main": "lib/nacl_factory.js",
     "author": "Tony Garnock-Jones",
     "keywords": ["encryption", "high-level", "crypto", "networking", "nacl"],
