@@ -1,6 +1,6 @@
 {
     "name": "js-nacl",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "description": "High-level API to libsodium.",
     "main": "lib/nacl_factory.js",
     "author": "Tony Garnock-Jones",
