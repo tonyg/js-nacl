@@ -25,6 +25,9 @@ all the versions I've tried.
 
 ## Changes
 
+Version 1.2.1: Repaired a mistake where I had failed to export the new
+names `crypto_sign_seed_keypair` and `crypto_box_seed_keypair`.
+
 Version 1.2.0: js-nacl is now based around libsodium rather than the
 plain NaCl tarball. Functions `crypto_sign_keypair_from_seed` and
 `crypto_box_keypair_from_seed` have been renamed to their libsodium

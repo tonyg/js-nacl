@@ -41,7 +41,7 @@ suite.hashing = function () {
 
 suite.boxKeypairFromSeed = function () {
     var seed = nacl.encode_utf8("hello");
-    var kp = nacl.crypto_box_keypair_from_seed(seed);
+    var kp = nacl.crypto_box_seed_keypair(seed);
     assert.equal(nacl.to_hex(kp.boxPk),
 		 "d8333ecf53dac465d59f3b03878ceff88947eec57c965105a049a0f5f1b7a510");
     assert.equal(nacl.to_hex(kp.boxSk),
@@ -58,7 +58,7 @@ suite.randomBoxNonceLength = function () {
 
 suite.precomputedBox = function () {
     var seed = nacl.encode_utf8("hello");
-    var kp = nacl.crypto_box_keypair_from_seed(seed);
+    var kp = nacl.crypto_box_seed_keypair(seed);
     var selfShared = nacl.crypto_box_precompute(kp.boxPk, kp.boxSk);
     var nonce = wouldBeRandomInARealProgram(nacl.crypto_box_NONCEBYTES);
     var plaintext = "box test";
@@ -70,7 +70,7 @@ suite.precomputedBox = function () {
 
 suite.normalBox = function () {
     var seed = nacl.encode_utf8("hello");
-    var kp = nacl.crypto_box_keypair_from_seed(seed);
+    var kp = nacl.crypto_box_seed_keypair(seed);
     var nonce = wouldBeRandomInARealProgram(nacl.crypto_box_NONCEBYTES);
     var plaintext = "box test";
     var c = nacl.crypto_box(nacl.encode_utf8(plaintext), nonce, kp.boxPk, kp.boxSk);
@@ -140,7 +140,7 @@ suite.signatures = function () {
     var seed = nacl.crypto_hash_string("This is my passphrase").subarray(0, seedlen);
     assert.equal(nacl.to_hex(seed),
 		 "2268afda5a2a900cf07bdbaa05312a958b54e25c8042157840b8e79386512af1");
-    var kp = nacl.crypto_sign_keypair_from_seed(seed);
+    var kp = nacl.crypto_sign_seed_keypair(seed);
     assert.equal(nacl.to_hex(kp.signPk),
 		 "ba1000e3fe1213a53129e2d071c5e55a9afcad1c355fae453dd4dd2e7aaac242");
     assert.equal(nacl.to_hex(kp.signSk),
@@ -227,14 +227,14 @@ suite.seededBoxKeypairIdentities1 = function () {
 suite.seededBoxKeypairIdentities2 = function () {
     var seed = nacl.encode_utf8("the seed");
     var sk = nacl.crypto_hash(seed).subarray(0, nacl.crypto_box_SECRETKEYBYTES);
-    var kp = nacl.crypto_box_keypair_from_seed(seed);
+    var kp = nacl.crypto_box_seed_keypair(seed);
     assert.equal(nacl.to_hex(kp.boxSk), nacl.to_hex(sk));
 };
 
 suite.seededSignKeypairIdentities1 = function () {
     var seedlen = nacl.crypto_sign_SECRETKEYBYTES / 2; // probably should be defined as a constant
     var kp1 = nacl.crypto_sign_keypair();
-    var kp2 = nacl.crypto_sign_keypair_from_seed(kp1.signSk.subarray(0, seedlen));
+    var kp2 = nacl.crypto_sign_seed_keypair(kp1.signSk.subarray(0, seedlen));
     assert.equal(nacl.to_hex(kp2.signPk), nacl.to_hex(kp1.signPk));
     assert.equal(nacl.to_hex(kp2.signSk), nacl.to_hex(kp1.signSk));
 };
@@ -242,6 +242,6 @@ suite.seededSignKeypairIdentities1 = function () {
 suite.seededSignKeypairIdentities2 = function () {
     var seedlen = nacl.crypto_sign_SECRETKEYBYTES / 2; // probably should be defined as a constant
     var seed = nacl.crypto_hash(nacl.encode_utf8("the seed")).subarray(0, seedlen);
-    var kp = nacl.crypto_sign_keypair_from_seed(seed);
+    var kp = nacl.crypto_sign_seed_keypair(seed);
     assert.equal(nacl.to_hex(kp.signSk.subarray(0, seedlen)), nacl.to_hex(seed));
 };
