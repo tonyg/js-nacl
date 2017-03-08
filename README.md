@@ -25,6 +25,8 @@ all the versions I've tried.
 
 ## Changes
 
+Version 1.2.2: Updated from libsodium 1.0.10 to 1.0.11.
+
 Version 1.2.1: Repaired a mistake where I had failed to export the new
 names `crypto_sign_seed_keypair` and `crypto_box_seed_keypair`.
 

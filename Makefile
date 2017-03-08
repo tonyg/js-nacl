@@ -1,7 +1,7 @@
-LIBSODIUMVERSION=1.0.10
+LIBSODIUMVERSION=1.0.11
 LIBSODIUMUNPACKED=libsodium-$(LIBSODIUMVERSION)
 
-LIBSODIUM_JS=$(LIBSODIUMUNPACKED)/libsodium-js/lib/libsodium.js
+LIBSODIUM_JS=$(LIBSODIUMUNPACKED)/libsodium-js-sumo/lib/libsodium.js
 
 test: all
 	npm test
@@ -13,7 +13,7 @@ clean:
 	rm -rf lib
 
 $(LIBSODIUM_JS): $(LIBSODIUMUNPACKED)
-	(cd libsodium-1.0.10; ./dist-build/emscripten.sh --sumo)
+	(cd $(LIBSODIUMUNPACKED); ./dist-build/emscripten.sh --sumo)
 
 lib: $(LIBSODIUM_JS) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
 	mkdir -p $@
