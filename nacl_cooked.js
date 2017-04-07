@@ -419,6 +419,26 @@ var nacl = (function () {
     function crypto_box_keypair_from_raw_sk(sk) {
       return {boxPk: crypto_scalarmult_base(sk), boxSk: sk};
     }
+    
+    function crypto_box_keypair_from_sign_sk(sk) {
+      var ska = check_injectBytes("crypto_box_keypair_from_sign_sk", "sk", sk,
+        nacl_raw._crypto_sign_secretkeybytes());
+      var skb = new Target(nacl_raw._crypto_box_secretkeybytes());
+      check("_crypto_sign_ed25519_sk_to_curve25519",
+        nacl_raw._crypto_sign_ed25519_sk_to_curve25519(skb.address, ska));
+      FREE(ska);
+      return crypto_box_keypair_from_raw_sk(skb.extractBytes());
+    }
+
+    function crypto_box_pk_from_sign_pk(pk) {
+      var pka = check_injectBytes("crypto_box_pk_from_sign_pk", "pk", pk,
+        nacl_raw._crypto_sign_publickeybytes());
+      var pkb = new Target(nacl_raw._crypto_box_publickeybytes());
+      check("_crypto_sign_ed25519_pk_to_curve25519",
+        nacl_raw._crypto_sign_ed25519_pk_to_curve25519(pkb.address, pka));
+      FREE(pka);
+      return pkb.extractBytes();
+    }
 
     //---------------------------------------------------------------------------
     // Scalarmult
@@ -519,6 +539,8 @@ var nacl = (function () {
     exports.crypto_sign_seed_keypair = crypto_sign_seed_keypair;
     exports.crypto_box_seed_keypair = crypto_box_seed_keypair;
     exports.crypto_box_keypair_from_raw_sk = crypto_box_keypair_from_raw_sk;
+    exports.crypto_box_keypair_from_sign_sk = crypto_box_keypair_from_sign_sk;
+    exports.crypto_box_pk_from_sign_pk = crypto_box_pk_from_sign_pk;
     // Backwards-compatibility:
     exports.crypto_sign_keypair_from_seed = crypto_sign_seed_keypair;
     exports.crypto_box_keypair_from_seed = crypto_box_seed_keypair;
