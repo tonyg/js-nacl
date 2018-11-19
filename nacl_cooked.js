@@ -343,6 +343,32 @@ var nacl = (function () {
     }
 
     //---------------------------------------------------------------------------
+    // Boxing with ephemeral keys
+
+    function crypto_box_seal(msg, pk) {
+      var m = injectBytes(msg);
+      var pka = check_injectBytes("crypto_box_seal",
+                                  "pk", pk, nacl_raw._crypto_box_publickeybytes());
+      var c = new Target(msg.length + nacl_raw._crypto_box_sealbytes());
+      check("_crypto_box_seal", nacl_raw._crypto_box_seal(c.address, m, msg.length, 0, pka));
+      free_all([m, pka]);
+      return c.extractBytes();
+    }
+
+    function crypto_box_seal_open(ciphertext, pk, sk) {
+      var c = injectBytes(ciphertext);
+      var pka = check_injectBytes("crypto_box_seal_open",
+                                  "pk", pk, nacl_raw._crypto_box_publickeybytes());
+      var ska = check_injectBytes("crypto_box_seal_open",
+                                  "sk", sk, nacl_raw._crypto_box_secretkeybytes());
+      var m = new Target(ciphertext.length - nacl_raw._crypto_box_sealbytes());
+      check("_crypto_box_seal_open",
+            nacl_raw._crypto_box_seal_open(m.address, c, ciphertext.length, 0, pka, ska));
+      free_all([c, pka, ska]);
+      return m.extractBytes();
+    }
+
+    //---------------------------------------------------------------------------
     // Signing
 
     function crypto_sign_keypair() {
@@ -505,6 +531,9 @@ var nacl = (function () {
     exports.crypto_secretbox_random_nonce = crypto_secretbox_random_nonce;
     exports.crypto_secretbox = crypto_secretbox;
     exports.crypto_secretbox_open = crypto_secretbox_open;
+
+    exports.crypto_box_seal = crypto_box_seal;
+    exports.crypto_box_seal_open = crypto_box_seal_open;
 
     exports.crypto_sign_keypair = crypto_sign_keypair;
     exports.crypto_sign = crypto_sign;

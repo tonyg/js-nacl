@@ -245,3 +245,11 @@ suite.seededSignKeypairIdentities2 = function () {
     var kp = nacl.crypto_sign_seed_keypair(seed);
     assert.equal(nacl.to_hex(kp.signSk.subarray(0, seedlen)), nacl.to_hex(seed));
 };
+
+suite.sealedBoxBasic = function () {
+  var kp = nacl.crypto_box_keypair();
+  var msg = nacl.encode_utf8("hello sealed box");
+  var c = nacl.crypto_box_seal(msg, kp.boxPk);
+  var d = nacl.crypto_box_seal_open(c, kp.boxPk, kp.boxSk);
+  assert.equal(nacl.to_hex(msg), nacl.to_hex(d));
+};
