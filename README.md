@@ -25,6 +25,12 @@ all the versions I've tried.
 
 ## Changes
 
+Version 1.3.2: The Emscripten-compiled code is now configured so that
+it no longer adds a listener to the `uncaughtException` when running
+in node.js. See issue #46.
+
+Version 1.3.1: Correct a minor packaging error.
+
 Version 1.3.0: Updated from libsodium 1.0.11 to stable-2018-11-19.
 Added `crypto_box_seal` and `crypto_box_seal_open`. Switched from
 using the Emscripten SDK to using a Dockerized Emscripten to produce

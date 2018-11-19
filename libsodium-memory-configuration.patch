@@ -6,7 +6,7 @@ diff -ur libsodium-stable.orig/dist-build/emscripten.sh libsodium-stable/dist-bu
  elif [ "x$1" = "x--sumo" ]; then
    export EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS_SUMO"
 -  export LDFLAGS="${LDFLAGS} ${LDFLAGS_DIST} -s TOTAL_MEMORY=${TOTAL_MEMORY_SUMO}"
-+  export LDFLAGS="${LDFLAGS} ${LDFLAGS_DIST} -s ALLOW_MEMORY_GROWTH=1"
++  export LDFLAGS="${LDFLAGS} ${LDFLAGS_DIST} -s ALLOW_MEMORY_GROWTH=1 -s NODEJS_CATCH_EXIT=0"
    export PREFIX="$(pwd)/libsodium-js-sumo"
    export DONE_FILE="$(pwd)/js-sumo.done"
    export DIST='yes'
