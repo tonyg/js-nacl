@@ -473,7 +473,7 @@ js-nacl is written by Tony Garnock-Jones <tonygarnockjones@gmail.com>
 and is licensed under the [MIT
 license](http://opensource.org/licenses/MIT):
 
-> Copyright &copy; 2013-2016 Tony Garnock-Jones.
+> Copyright &copy; 2013-2018 Tony Garnock-Jones.
 >
 > Permission is hereby granted, free of charge, to any person
 > obtaining a copy of this software and associated documentation files
@@ -498,7 +498,7 @@ license](http://opensource.org/licenses/MIT):
 js-nacl relies on libsodium, which is released under the
 [ISC license](https://en.wikipedia.org/wiki/ISC_license):
 
-> Copyright (c) 2013-2016
+> Copyright (c) 2013-2018
 > Frank Denis <j at pureftpd dot org>
 >
 > Permission to use, copy, modify, and/or distribute this software for any
