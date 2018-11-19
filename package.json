@@ -1,19 +1,27 @@
 {
     "name": "js-nacl",
-    "version": "1.2.2",
+    "version": "1.3.0",
     "description": "High-level API to libsodium.",
     "main": "lib/nacl_factory.js",
     "author": "Tony Garnock-Jones",
-    "keywords": ["encryption", "high-level", "crypto", "networking", "nacl"],
-    "repository" : {
+    "keywords": [
+        "encryption",
+        "high-level",
+        "crypto",
+        "networking",
+        "nacl"
+    ],
+    "repository": {
         "type": "git",
         "url": "https://github.com/tonyg/js-nacl.git"
     },
-    "engines": { "node": "*" },
+    "engines": {
+        "node": "*"
+    },
     "scripts": {
-	"test": "./node_modules/mocha/bin/mocha --ui exports test"
+        "test": "./node_modules/mocha/bin/mocha --ui exports test"
     },
     "devDependencies": {
-	"mocha": ""
+        "mocha": "^5.2.0"
     }
 }

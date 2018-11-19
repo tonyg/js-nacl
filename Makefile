@@ -1,5 +1,5 @@
-LIBSODIUMVERSION=1.0.11
-LIBSODIUMUNPACKED=libsodium-$(LIBSODIUMVERSION)
+LIBSODIUMVERSION=stable-2018-11-19
+LIBSODIUMUNPACKED=libsodium-stable
 
 LIBSODIUM_JS=$(LIBSODIUMUNPACKED)/libsodium-js-sumo/lib/libsodium.js
 
@@ -13,7 +13,12 @@ clean:
 	rm -rf lib
 
 $(LIBSODIUM_JS): $(LIBSODIUMUNPACKED)
-	(cd $(LIBSODIUMUNPACKED); ./dist-build/emscripten.sh --sumo)
+	docker run --rm \
+		-v $$(pwd)/$(LIBSODIUMUNPACKED):/src \
+		--user $$(id -u):$$(id -g) \
+		trzeci/emscripten \
+		/src/dist-build/emscripten.sh --sumo
+	[ -f $@ ] && touch $@
 
 lib: $(LIBSODIUM_JS) nacl_cooked_prefix.js nacl_cooked.js nacl_cooked_suffix.js
 	mkdir -p $@
@@ -26,3 +31,6 @@ veryclean: clean
 
 $(LIBSODIUMUNPACKED): libsodium-$(LIBSODIUMVERSION).tar.gz
 	tar -zxvf $<
+	patch -p0 < libsodium-memory-configuration.patch
+
+.PRECIOUS: $(LIBSODIUM_JS)

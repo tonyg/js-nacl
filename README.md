@@ -25,6 +25,13 @@ all the versions I've tried.
 
 ## Changes
 
+Version 1.3.0: Updated from libsodium 1.0.11 to stable-2018-11-19.
+Added `crypto_box_seal` and `crypto_box_seal_open`. Switched from
+using the Emscripten SDK to using a Dockerized Emscripten to produce
+the built version of the library. Because this enables WASM by
+default, the approach to handling of `requested_total_memory` is now
+different; see below.
+
 Version 1.2.2: Updated from libsodium 1.0.10 to 1.0.11.
 
 Version 1.2.1: Repaired a mistake where I had failed to export the new
@@ -95,6 +102,9 @@ Or if you have installed the library via `npm`,
       console.log(nacl.to_hex(nacl.random_bytes(16)));
     });
 
+In addition, since version 1.3.0, the `instantiate` function returns a
+`Promise` that yields the `nacl` object.
+
 ## Instantiating the NaCl module
 
 Pass `nacl_factory.instantiate` a callback function expecting a single
@@ -104,21 +114,14 @@ The `nacl_factory.instantiate` function expects also a second optional
 argument, a dictionary of optional configuration values.
 
 Each call to `nacl_factory.instantiate()` creates an entirely fresh
-module instance, complete with its own private heap area. By default,
-this heap is 32 megabytes in size, 33,554,432 bytes. The size of the
-module instance's private heap can be altered by supplying
-`requested_total_memory` to to `instantiate`, e.g.:
-
-    nacl_factory.instantiate(on_ready, {
-      requested_total_memory: 16777216
-    });
-
-The argument must be a power of two, if supplied.
+module instance, complete with its own private heap area. **Since
+v1.3.0:** The heap should automatically grow as required, and should
+no longer require manual ahead-of-time configuration.
 
 It's fine to instantiate the module more than once in a single
-program, though do note the large amount of memory taken up by each
-instance. The memory assigned to each module instance will not be
-released until the instance is garbage collected.
+program, though beware of the large amount of memory potentially taken
+up by each instance. The memory assigned to each module instance will
+not be released until the instance is garbage collected.
 
 If you notice memory leaks across multiple uses of a *single* module
 instance, please report them, with a test case if at all possible.
@@ -260,6 +263,26 @@ Uint8Array must be `nacl.crypto_secretbox_KEYBYTES` bytes long.
 
 Verifies and decrypts a packet from `crypto_secretbox`. Throws an
 exception if the verification fails or any of the inputs are invalid.
+
+## Anonymous authenticated encryption: crypto_box_seal
+
+Uses a freshly-created ephemeral box keypair to send an "anonymous"
+message to a specific recipient, who is identified by their public box
+key, and who may decrypt the message using the matching box keypair.
+
+### nacl.crypto\_box\_seal(msgBin, recipientPublicKeyBin) → Uint8Array
+
+Places `msgBin` in an authenticated, encrypted box that can only be
+verified and decrypted by the secret key corresponding to
+`recipientPublicKeyBin`.
+
+### nacl.crypto\_box\_seal\_open(ciphertextBin, recipientPublicKeyBin, recipientSecretKeyBin) → Uint8Array
+
+Verifies and decrypts a box from `crypto_box_seal`. Throws an
+exception if the verification fails or any of the inputs are invalid.
+Unlike `crypto_box_open`, no nonce is required, and the *recipient's*
+public key is supplied instead of the *sender's*. The sender remains
+anonymous.
 
 ## Secret-key encryption: crypto_stream
 

@@ -1,0 +1,12 @@
+diff -ur libsodium-stable.orig/dist-build/emscripten.sh libsodium-stable/dist-build/emscripten.sh
+--- libsodium-stable.orig/dist-build/emscripten.sh	2018-10-31 09:44:27.000000000 +0000
++++ libsodium-stable/dist-build/emscripten.sh	2018-11-19 12:52:53.771535287 +0000
+@@ -26,7 +26,7 @@
+   echo "Building a standard distribution in [${PREFIX}]"
+ elif [ "x$1" = "x--sumo" ]; then
+   export EXPORTED_FUNCTIONS="$EXPORTED_FUNCTIONS_SUMO"
+-  export LDFLAGS="${LDFLAGS} ${LDFLAGS_DIST} -s TOTAL_MEMORY=${TOTAL_MEMORY_SUMO}"
++  export LDFLAGS="${LDFLAGS} ${LDFLAGS_DIST} -s ALLOW_MEMORY_GROWTH=1"
+   export PREFIX="$(pwd)/libsodium-js-sumo"
+   export DONE_FILE="$(pwd)/js-sumo.done"
+   export DIST='yes'

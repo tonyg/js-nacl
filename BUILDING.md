@@ -6,8 +6,13 @@ policy is to include the generated javascript as a checked-in file.
 ## Ingredients
 
  - Python 2.x
- - a recent Emscripten SDK
+ - Docker, or a recent Emscripten SDK
  - Node.js and npm to run the [mocha](http://visionmedia.github.io/mocha/)-based tests
+
+Recently, I have had trouble getting a stable Emscripten setup on my
+machines, so I now primarily use a
+[Dockerized Emscripten](https://hub.docker.com/r/trzeci/emscripten/)
+courtesy of Docker user `trzeci`.
 
 Within the `js-nacl` directory,
 
@@ -29,11 +34,7 @@ Within the `js-nacl` directory,
 
 ## Method
 
-Follow the instructions from the [Emscripten
-tutorial](http://emscripten.org/Tutorial) to get Emscripten ready to
-run.
-
-Once `emcc` is on your `$PATH` somewhere, use the `js-nacl` Makefile.
+The `js-nacl` Makefile assumes the use of Docker Emscripten.
 
 To rebuild everything:
 
@@ -54,6 +55,18 @@ Other Makefile targets:
    the `libsodium` tarball.
 
  - `make all`: performs all the build steps.
+
+### Using the Emscripten SDK instead of Docker
+
+If you are not using the Docker Emscripten image, follow the
+instructions from the
+[Emscripten tutorial](http://emscripten.org/Tutorial) to get
+Emscripten ready to run.
+
+Once `emcc` is on your `$PATH` somewhere, build the `libsodium.js`
+file by unpacking the libsodium sources, applying patches as necessary
+(see the Makefile), changing to the `dist-build` directory in the
+unpacked sources, and running `./emscripten.sh --sumo`.
 
 If you for some reason need to use a different python than `python`,
 set the `PYTHON` makefile variable; for example,

@@ -1,8 +1,10 @@
 if (typeof module !== 'undefined' && module.exports) {
   // We are running in node
   var nacl;
-  require("../lib/nacl_factory.js").instantiate(function (nacl_instance) {
-    nacl = nacl_instance;
+  before(function () {
+    return require("../lib/nacl_factory.js").instantiate(function (nacl_instance) {
+      nacl = nacl_instance;
+    });
   });
   var assert = require("assert");
   var suite = module.exports;

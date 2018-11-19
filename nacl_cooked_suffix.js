@@ -1,10 +1,9 @@
-      nacl.nacl_raw = nacl_raw;
-
-      if (on_ready_call_needed) {
+      return nacl_raw.ready.then(function () {
+        var nacl = nacl_cooked(nacl_raw);
+        nacl.nacl_raw = nacl_raw;
         on_ready(nacl);
-      }
-
-      return "nacl_factory API has changed -- see js-nacl README";
+        return nacl;
+      });
     })((typeof window !== 'undefined') ? window : undefined_reference_value,
        (typeof document !== 'undefined') ? document : undefined_reference_value);
   }
