@@ -255,3 +255,50 @@ suite.sealedBoxBasic = function () {
   var d = nacl.crypto_box_seal_open(c, kp.boxPk, kp.boxSk);
   assert.equal(nacl.to_hex(msg), nacl.to_hex(d));
 };
+
+suite.argonConstants = function () {
+    assert.notEqual(
+        nacl.crypto_pwhash_argon2i,
+        null,
+        "constant for Argon2i should be defined"
+    );
+    assert.notEqual(
+        nacl.crypto_pwhash_argon2d,
+        null,
+        "constant for Argon2d should be defined"
+    );
+    assert.notEqual(
+        nacl.crypto_pwhash_argon2id,
+        null,
+        "constant for Argon2id should be defined"
+    );
+};
+
+suite.argon2hash = function () {
+    var hashBuf = nacl.crypto_pwhash(
+        "Correct Horse Battery Staple",
+        Buffer.from(
+            "045295c54ac968c5340a7da1334d0cc5c388d4fba010d5b35156603379344b2d",
+            "hex"
+        ),
+        3,
+        32 * 1024,
+        nacl.crypto_pwhash_argon2id
+    );
+    assert.equal(
+        hashBuf.toString("hex"),
+        "bb180e164564b225be71b1335fea063589ef51dbb3bf2fc54d28e69a965e1a44"
+    );
+};
+
+suite.secretKey = function () {
+    assert.equal(
+        typeof nacl.crypto_secretbox_keygen,
+        "function",
+        "crypto_secretbox_keygen should be defined"
+    );
+    assert(
+        nacl.crypto_secretbox_keygen() instanceof Uint8Array,
+        "crypto_secretbox_keygen() should return a Uint8Array"
+    );
+}
