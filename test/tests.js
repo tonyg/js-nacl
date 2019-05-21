@@ -255,3 +255,23 @@ suite.sealedBoxBasic = function () {
   var d = nacl.crypto_box_seal_open(c, kp.boxPk, kp.boxSk);
   assert.equal(nacl.to_hex(msg), nacl.to_hex(d));
 };
+
+suite.boxToSignKeyConversion = function () {
+  // Adapted from libsodium/test/default/ed25519_convert.{c,exp}
+  var sign_ed25519_seed =
+	nacl.from_hex("421151a459faeade3d247115f94aedae42318124095afabe4d1451a559faedee");
+
+  var expected_curve25519_sk =
+	nacl.from_hex("8052030376d47112be7f73ed7a019293dd12ad910b654455798b4667d73de166");
+  var expected_curve25519_pk =
+	nacl.from_hex("f1814f0e8ff1043d8a44d25babff3cedcae6c22c3edaa48f857ae70de2baae50");
+
+  var ed25519_kp = nacl.crypto_sign_seed_keypair(sign_ed25519_seed);
+
+  var curve25519_kp = nacl.crypto_box_keypair_from_sign_sk(ed25519_kp.signSk);
+  assert.equal(nacl.to_hex(expected_curve25519_sk), nacl.to_hex(curve25519_kp.boxSk));
+  assert.equal(nacl.to_hex(expected_curve25519_pk), nacl.to_hex(curve25519_kp.boxPk));
+
+  var curve25519_pk = nacl.crypto_box_pk_from_sign_pk(ed25519_kp.signPk);
+  assert.equal(nacl.to_hex(expected_curve25519_pk), nacl.to_hex(curve25519_pk));
+};
