@@ -65,8 +65,8 @@ Emscripten ready to run.
 
 Once `emcc` is on your `$PATH` somewhere, build the `libsodium.js`
 file by unpacking the libsodium sources, applying patches as necessary
-(see the Makefile), changing to the `dist-build` directory in the
-unpacked sources, and running `./emscripten.sh --sumo`.
+(see the Makefile), changing to the unpacked libsodium directory,
+and running `dist-build/emscripten.sh --sumo`.
 
 If you for some reason need to use a different python than `python`,
 set the `PYTHON` makefile variable; for example,
