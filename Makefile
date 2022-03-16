@@ -1,4 +1,4 @@
-LIBSODIUMVERSION=stable-2018-11-19
+LIBSODIUMVERSION=1.0.18-stable
 LIBSODIUMUNPACKED=libsodium-stable
 
 LIBSODIUM_JS=$(LIBSODIUMUNPACKED)/libsodium-js-sumo/lib/libsodium.js

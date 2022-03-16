@@ -25,6 +25,8 @@ all the versions I've tried.
 
 ## Changes
 
+Version 1.4.0: Updated from libsodium stable-2018-11-19 to 1.0.18-stable.
+
 Version 1.3.2: The Emscripten-compiled code is now configured so that
 it no longer adds a listener to the `uncaughtException` when running
 in node.js. See issue #46.
