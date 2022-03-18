@@ -255,6 +255,10 @@ in the "Security model" section of the NaCl API documentation!**
     c = nacl.crypto_secretbox(m, n, k);
     m1 = nacl.crypto_secretbox_open(c, n, k);
     "message" === nacl.decode_utf8(m1); // always true
+    
+### nacl.crypto\_secretbox\_keygen() → Uint8Array
+
+Generates a random key buffer.
 
 ### nacl.crypto\_secretbox\_random\_nonce() → Uint8Array
 
@@ -382,6 +386,12 @@ length.
 signer's public signing key, returns `true` if the signature is valid,
 and `false` otherwise.
 
+## Argon2 password hashing
+
+### nacl.crypto\_pwhash(passwordStr, saltBin, time, memory, nacl.crypto_pwhash_argon2i | nacl.crypto_pwhash_argon2d | nacl.crypto_pwhash_argon2id) → Uint8Array  
+
+Computes the Argon2 password hash of the password.
+
 ## Derived Keys
 
 **WARNING: Experimental**
@@ -389,7 +399,7 @@ and `false` otherwise.
 If you see yourself wanting to use these, you will need to know why
 [PBKDF2](http://en.wikipedia.org/wiki/PBKDF2) and
 [scrypt](http://www.tarsnap.com/scrypt.html) are of crucial
-importance.
+importance; or use Argon2 (above).
 
 You might like to explore the use of these functions in tandem with
 `scrypt.crypto_scrypt` from
